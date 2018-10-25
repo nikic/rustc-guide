@@ -1,0 +1,392 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Using compiletest + commands to control testexecution - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html" class="active"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#compiletest" id="compiletest"><h1><code>compiletest</code></h1></a>
+<a class="header" href="#introduction" id="introduction"><h2>Introduction</h2></a>
+<p><code>compiletest</code> is the main test harness of the Rust test suite.  It allows
+test authors to organize large numbers of tests (the Rust compiler has many
+thousands), efficient test execution (parallel execution is supported), and
+allows the test author to configure behavior and expected results of both
+individual and groups of tests.</p>
+<p><code>compiletest</code> tests may check test code for success, for failure or in some
+cases, even failure to compile.  Tests are typically organized as a Rust source
+file with annotations in comments before and/or within the test code, which
+serve to direct <code>compiletest</code> on if or how to run the test, what behavior to
+expect, and more.  If you are unfamiliar with the compiler testing framework,
+see <a href="./tests/intro.html">this chapter</a> for additional background.</p>
+<p>The tests themselves are typically (but not always) organized into
+&quot;suites&quot; – for example, <code>run-pass</code>, a folder representing tests that should
+succeed, <code>run-fail</code>, a folder holding tests that should compile successfully,
+but return a failure (non-zero status), <code>compile-fail</code>, a folder holding tests
+that should fail to compile, and many more.  The various suites are defined in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/common.rs">src/tools/compiletest/src/common.rs</a> in the <code>pub struct Config</code>
+declaration.  And a very good introduction to the different suites of compiler
+tests along with details about them can be found in <a href="./tests/adding.html">Adding new
+tests</a>.</p>
+<a class="header" href="#adding-a-new-test-file" id="adding-a-new-test-file"><h2>Adding a new test file</h2></a>
+<p>Briefly, simply create your new test in the appropriate location under
+<a href="https://github.com/rust-lang/rust/tree/master/src/test">src/test</a>. No registration of test files is necessary as <code>compiletest</code>
+will scan the <a href="https://github.com/rust-lang/rust/tree/master/src/test">src/test</a> subfolder recursively, and will execute any Rust
+source files it finds as tests.  See <a href="./tests/adding.html"><code>Adding new tests</code></a>
+for a complete guide on how to adding new tests.</p>
+<a class="header" href="#header-commands" id="header-commands"><h2>Header Commands</h2></a>
+<p>Source file annotations which appear in comments near the top of the source
+file <em>before</em> any test code are known as header commands.  These commands can
+instruct <code>compiletest</code> to ignore this test, set expectations on whether it is
+expected to succeed at compiling, or what the test's return code is expected to
+be.  Header commands (and their inline counterparts, Error Info commands) are
+described more fully
+<a href="./tests/adding.html#header-commands-configuring-rustc">here</a>.</p>
+<a class="header" href="#adding-a-new-header-command" id="adding-a-new-header-command"><h3>Adding a new header command</h3></a>
+<p>Header commands are defined in the <code>TestProps</code> struct in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/header.rs">src/tools/compiletest/src/header.rs</a>.  At a high level, there are
+dozens of test properties defined here, all set to default values in the
+<code>TestProp</code> struct's <code>impl</code> block. Any test can override this default value by
+specifying the property in question as header command as a comment (<code>//</code>) in
+the test source file, before any source code.</p>
+<a class="header" href="#using-a-header-command" id="using-a-header-command"><h4>Using a header command</h4></a>
+<p>Here is an example, specifying the <code>must-compile-successfully</code> header command,
+which takes no arguments, followed by the <code>failure-status</code> header command,
+which takes a single argument (which, in this case is a value of 1).
+<code>failure-status</code> is instructing <code>compiletest</code> to expect a failure status of 1
+(rather than the current Rust default of 101 at the time of this writing).  The
+header command and the argument list (if present) are typically separated by a
+colon:</p>
+<pre><code class="language-rust ignore">// must-compile-successfully
+// failure-status: 1
+
+#![feature(termination_trait)]
+
+use std::io::{Error, ErrorKind};
+
+fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {
+    Err(Box::new(Error::new(ErrorKind::Other, &quot;returned Box&lt;Error&gt; from main()&quot;)))
+}
+</code></pre>
+<a class="header" href="#adding-a-new-header-command-property" id="adding-a-new-header-command-property"><h4>Adding a new header command property</h4></a>
+<p>One would add a new header command if there is a need to define some test
+property or behavior on an individual, test-by-test basis.  A header command
+property serves as the header command's backing store (holds the command's
+current value) at runtime.</p>
+<p>To add a new header command property:
+1. Look for the <code>pub struct TestProps</code> declaration in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/header.rs">src/tools/compiletest/src/header.rs</a> and add the new public
+property to the end of the declaration.
+2. Look for the <code>impl TestProps</code> implementation block immediately following
+the struct declaration and initialize the new property to its default
+value.</p>
+<a class="header" href="#adding-a-new-header-command-parser" id="adding-a-new-header-command-parser"><h4>Adding a new header command parser</h4></a>
+<p>When <code>compiletest</code> encounters a test file, it parses the file a line at a time
+by calling every parser defined in the <code>Config</code> struct's implementation block,
+also in <a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/header.rs">src/tools/compiletest/src/header.rs</a> (note the <code>Config</code>
+struct's declaration block is found in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/common.rs">src/tools/compiletest/src/common.rs</a>.  <code>TestProps</code>'s <code>load_from()</code>
+method will try passing the current line of text to each parser, which, in turn
+typically checks to see if the line begins with a particular commented (<code>//</code>)
+header command such as <code>// must-compile-successfully</code> or <code>// failure-status</code>.
+Whitespace after the comment marker is optional.</p>
+<p>Parsers will override a given header command property's default value merely by
+being specified in the test file as a header command or by having a parameter
+value specified in the test file, depending on the header command.</p>
+<p>Parsers defined in <code>impl Config</code> are typically named <code>parse_&lt;header_command&gt;</code>
+(note kebab-case <code>&lt;header-command&gt;</code> transformed to snake-case
+<code>&lt;header_command&gt;</code>).  <code>impl Config</code> also defines several 'low-level' parsers
+which make it simple to parse common patterns like simple presence or not
+(<code>parse_name_directive()</code>), header-command:parameter(s)
+(<code>parse_name_value_directive()</code>), optional parsing only if a particular <code>cfg</code>
+attribute is defined (<code>has_cfg_prefix()</code>) and many more.  The low-level parsers
+are found near the end of the <code>impl Config</code> block; be sure to look through them
+and their associated parsers immediately above to see how they are used to
+avoid writing additional parsing code unnecessarily.</p>
+<p>As a concrete example, here is the implementation for the
+<code>parse_failure_status()</code> parser, in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/header.rs">src/tools/compiletest/src/header.rs</a>:</p>
+<pre><code class="language-diff">@@ -232,6 +232,7 @@ pub struct TestProps {
+     // customized normalization rules
+     pub normalize_stdout: Vec&lt;(String, String)&gt;,
+     pub normalize_stderr: Vec&lt;(String, String)&gt;,
++    pub failure_status: i32,
+ }
+
+ impl TestProps {
+@@ -260,6 +261,7 @@ impl TestProps {
+             run_pass: false,
+             normalize_stdout: vec![],
+             normalize_stderr: vec![],
++            failure_status: 101,
+         }
+     }
+
+@@ -383,6 +385,10 @@ impl TestProps {
+             if let Some(rule) = config.parse_custom_normalization(ln, &quot;normalize-stderr&quot;) {
+                 self.normalize_stderr.push(rule);
+             }
++
++            if let Some(code) = config.parse_failure_status(ln) {
++                self.failure_status = code;
++            }
+         });
+
+         for key in &amp;[&quot;RUST_TEST_NOCAPTURE&quot;, &quot;RUST_TEST_THREADS&quot;] {
+@@ -488,6 +494,13 @@ impl Config {
+         self.parse_name_directive(line, &quot;pretty-compare-only&quot;)
+     }
+
++    fn parse_failure_status(&amp;self, line: &amp;str) -&gt; Option&lt;i32&gt; {
++        match self.parse_name_value_directive(line, &quot;failure-status&quot;) {
++            Some(code) =&gt; code.trim().parse::&lt;i32&gt;().ok(),
++            _ =&gt; None,
++        }
++    }
+</code></pre>
+<a class="header" href="#implementing-the-behavior-change" id="implementing-the-behavior-change"><h2>Implementing the behavior change</h2></a>
+<p>When a test invokes a particular header command, it is expected that some
+behavior will change as a result.  What behavior, obviously, will depend on the
+purpose of the header command.  In the case of <code>failure-status</code>, the behavior
+that changes is that <code>compiletest</code> expects the failure code defined by the
+header command invoked in the test, rather than the default value.</p>
+<p>Although specific to <code>failure-status</code> (as every header command will have a
+different implementation in order to invoke behavior change) perhaps it is
+helpful to see the behavior change implementation of one case, simply as an
+example.  To implement <code>failure-status</code>, the <code>check_correct_failure_status()</code>
+function found in the <code>TestCx</code> implementation block, located in
+<a href="https://github.com/rust-lang/rust/tree/master/src/tools/compiletest/src/runtest.rs">src/tools/compiletest/src/runtest.rs</a>,
+was modified as per below:</p>
+<pre><code class="language-diff">@@ -295,11 +295,14 @@ impl&lt;'test&gt; TestCx&lt;'test&gt; {
+     }
+
+     fn check_correct_failure_status(&amp;self, proc_res: &amp;ProcRes) {
+-        // The value the rust runtime returns on failure
+-        const RUST_ERR: i32 = 101;
+-        if proc_res.status.code() != Some(RUST_ERR) {
++        let expected_status = Some(self.props.failure_status);
++        let received_status = proc_res.status.code();
++
++        if expected_status != received_status {
+             self.fatal_proc_rec(
+-                &amp;format!(&quot;failure produced the wrong error: {}&quot;, proc_res.status),
++                &amp;format!(&quot;Error: expected failure status ({:?}) but received status {:?}.&quot;,
++                         expected_status,
++                         received_status),
+                 proc_res,
+             );
+         }
+@@ -320,7 +323,6 @@ impl&lt;'test&gt; TestCx&lt;'test&gt; {
+         );
+
+         let proc_res = self.exec_compiled_test();
+-
+         if !proc_res.status.success() {
+             self.fatal_proc_rec(&quot;test run failed!&quot;, &amp;proc_res);
+         }
+@@ -499,7 +501,6 @@ impl&lt;'test&gt; TestCx&lt;'test&gt; {
+                 expected,
+                 actual
+             );
+-            panic!();
+         }
+     }
+</code></pre>
+<p>Note the use of <code>self.props.failure_status</code> to access the header command
+property.  In tests which do not specify the failure status header command,
+<code>self.props.failure_status</code> will evaluate to the default value of 101 at the
+time of this writing.  But for a test which specifies a header command of, for
+example, <code>// failure-status: 1</code>, <code>self.props.failure_status</code> will evaluate to
+1, as <code>parse_failure_status()</code> will have overridden the <code>TestProps</code> default
+value, for that test specifically.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="tests/adding.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="compiler-debugging.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="tests/adding.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="compiler-debugging.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

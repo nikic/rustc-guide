@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Appendix C: Glossary - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "../";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="../about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="../compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="../how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="../build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="../compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="../conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="../walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="../tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="../tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="../tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="../compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="../compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="../profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="../profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="../high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="../rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="../rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="../query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="../incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="../incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="../the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="../test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="../macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="../name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="../hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="../lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="../ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="../type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="../traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="../traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="../traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="../traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="../traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="../traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="../traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="../traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="../traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="../traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="../traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="../traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="../traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="../traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="../traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="../traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="../traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="../traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="../type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="../method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="../variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="../existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="../mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="../mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="../mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="../mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="../mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="../borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="../borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="../borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="../const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="../miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="../param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="../codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="../diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="../appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="../appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="../appendix/glossary.html" class="active"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="../appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#appendix-c-glossary" id="appendix-c-glossary"><h1>Appendix C: Glossary</h1></a>
+<p>The compiler uses a number of...idiosyncratic abbreviations and things. This
+glossary attempts to list them and give you a few pointers for understanding
+them better.</p>
+<table><thead><tr><th>Term                    </th><th> Meaning</th></tr></thead><tbody>
+<tr><td>AST                     </td><td>  the abstract syntax tree produced by the syntax crate; reflects user syntax very closely.</td></tr>
+<tr><td>binder                  </td><td>  a &quot;binder&quot; is a place where a variable or type is declared; for example, the <code>&lt;T&gt;</code> is a binder for the generic type parameter <code>T</code> in <code>fn foo&lt;T&gt;(..)</code>, and |<code>a</code>|<code>...</code> is a binder for the parameter <code>a</code>. See <a href="./background.html#free-vs-bound">the background chapter for more</a></td></tr>
+<tr><td>bound variable          </td><td>  a &quot;bound variable&quot; is one that is declared within an expression/term. For example, the variable <code>a</code> is bound within the closure expession |<code>a</code>|<code>a * 2</code>. See <a href="./background.html#free-vs-bound">the background chapter for more</a></td></tr>
+<tr><td>codegen                 </td><td>  the code to translate MIR into LLVM IR.</td></tr>
+<tr><td>codegen unit            </td><td>  when we produce LLVM IR, we group the Rust code into a number of codegen units. Each of these units is processed by LLVM independently from one another, enabling parallelism. They are also the unit of incremental re-use.</td></tr>
+<tr><td>completeness            </td><td>  completeness is a technical term in type theory. Completeness means that every type-safe program also type-checks. Having both soundness and completeness is very hard, and usually soundness is more important. (see &quot;soundness&quot;).</td></tr>
+<tr><td>control-flow graph      </td><td>  a representation of the control-flow of a program; see <a href="./background.html#cfg">the background chapter for more</a></td></tr>
+<tr><td>CTFE                    </td><td>  Compile-Time Function Evaluation. This is the ability of the compiler to evaluate <code>const fn</code>s at compile time. This is part of the compiler's constant evaluation system. (<a href="../const-eval.html">see more</a>)</td></tr>
+<tr><td>cx                      </td><td>  we tend to use &quot;cx&quot; as an abbreviation for context. See also <code>tcx</code>, <code>infcx</code>, etc.</td></tr>
+<tr><td>DAG                     </td><td>  a directed acyclic graph is used during compilation to keep track of dependencies between queries. (<a href="../incremental-compilation.html">see more</a>)</td></tr>
+<tr><td>data-flow analysis      </td><td>  a static analysis that figures out what properties are true at each point in the control-flow of a program; see <a href="./background.html#dataflow">the background chapter for more</a></td></tr>
+<tr><td>DefId                   </td><td>  an index identifying a definition (see <code>librustc/hir/def_id.rs</code>). Uniquely identifies a <code>DefPath</code>.</td></tr>
+<tr><td>Double pointer          </td><td>  a pointer with additional metadata. See &quot;fat pointer&quot; for more.</td></tr>
+<tr><td>DST                     </td><td>  Dynamically-Sized Type. A type for which the compiler cannot statically know the size in memory (e.g. <code>str</code> or <code>[u8]</code>). Such types don't implement <code>Sized</code> and cannot be allocated on the stack. They can only occur as the last field in a struct. They can only be used behind a pointer (e.g. <code>&amp;str</code> or <code>&amp;[u8]</code>).</td></tr>
+<tr><td>empty type              </td><td>  see &quot;uninhabited type&quot;.</td></tr>
+<tr><td>Fat pointer             </td><td>  a two word value carrying the address of some value, along with some further information necessary to put the value to use. Rust includes two kinds of &quot;fat pointers&quot;: references to slices, and trait objects. A reference to a slice carries the starting address of the slice and its length. A trait object carries a value's address and a pointer to the trait's implementation appropriate to that value. &quot;Fat pointers&quot; are also known as &quot;wide pointers&quot;, and &quot;double pointers&quot;.</td></tr>
+<tr><td>free variable           </td><td>  a &quot;free variable&quot; is one that is not bound within an expression or term; see <a href="./background.html#free-vs-bound">the background chapter for more</a></td></tr>
+<tr><td>'gcx                    </td><td>  the lifetime of the global arena (<a href="../ty.html">see more</a>)</td></tr>
+<tr><td>generics                </td><td>  the set of generic type parameters defined on a type or item</td></tr>
+<tr><td>HIR                     </td><td>  the High-level IR, created by lowering and desugaring the AST (<a href="../hir.html">see more</a>)</td></tr>
+<tr><td>HirId                   </td><td>  identifies a particular node in the HIR by combining a def-id with an &quot;intra-definition offset&quot;.</td></tr>
+<tr><td>HIR Map                 </td><td>  The HIR map, accessible via tcx.hir, allows you to quickly navigate the HIR and convert between various forms of identifiers.</td></tr>
+<tr><td>ICE                     </td><td>  internal compiler error. When the compiler crashes.</td></tr>
+<tr><td>ICH                     </td><td>  incremental compilation hash. ICHs are used as fingerprints for things such as HIR and crate metadata, to check if changes have been made. This is useful in incremental compilation to see if part of a crate has changed and should be recompiled.</td></tr>
+<tr><td>inference variable      </td><td>  when doing type or region inference, an &quot;inference variable&quot; is a kind of special type/region that represents what you are trying to infer. Think of X in algebra. For example, if we are trying to infer the type of a variable in a program, we create an inference variable to represent that unknown type.</td></tr>
+<tr><td>infcx                   </td><td>  the inference context (see <code>librustc/infer</code>)</td></tr>
+<tr><td>IR                      </td><td>  Intermediate Representation. A general term in compilers. During compilation, the code is transformed from raw source (ASCII text) to various IRs. In Rust, these are primarily HIR, MIR, and LLVM IR. Each IR is well-suited for some set of computations. For example, MIR is well-suited for the borrow checker, and LLVM IR is well-suited for codegen because LLVM accepts it.</td></tr>
+<tr><td>local crate             </td><td>  the crate currently being compiled.</td></tr>
+<tr><td>LTO                     </td><td>  Link-Time Optimizations. A set of optimizations offered by LLVM that occur just before the final binary is linked. These include optimizations like removing functions that are never used in the final program, for example. <em>ThinLTO</em> is a variant of LTO that aims to be a bit more scalable and efficient, but possibly sacrifices some optimizations. You may also read issues in the Rust repo about &quot;FatLTO&quot;, which is the loving nickname given to non-Thin LTO. LLVM documentation: <a href="https://llvm.org/docs/LinkTimeOptimization.html">here</a> and <a href="https://clang.llvm.org/docs/ThinLTO.html">here</a></td></tr>
+<tr><td><a href="https://llvm.org/">LLVM</a>                  </td><td>  (actually not an acronym :P) an open-source compiler backend. It accepts LLVM IR and outputs native binaries. Various languages (e.g. Rust) can then implement a compiler front-end that output LLVM IR and use LLVM to compile to all the platforms LLVM supports.</td></tr>
+<tr><td>MIR                     </td><td>  the Mid-level IR that is created after type-checking for use by borrowck and codegen (<a href="../mir/index.html">see more</a>)</td></tr>
+<tr><td>miri                    </td><td>  an interpreter for MIR used for constant evaluation (<a href="../miri.html">see more</a>)</td></tr>
+<tr><td>normalize               </td><td>  a general term for converting to a more canonical form, but in the case of rustc typically refers to <a href="../traits/associated-types.html#normalize">associated type normalization</a></td></tr>
+<tr><td>newtype                 </td><td>  a &quot;newtype&quot; is a wrapper around some other type (e.g., <code>struct Foo(T)</code> is a &quot;newtype&quot; for <code>T</code>). This is commonly used in Rust to give a stronger type for indices.</td></tr>
+<tr><td>NLL                     </td><td> <a href="../borrow_check/region_inference.html">non-lexical lifetimes</a>, an extension to Rust's borrowing system to make it be based on the control-flow graph.</td></tr>
+<tr><td>node-id or NodeId       </td><td>  an index identifying a particular node in the AST or HIR; gradually being phased out and replaced with <code>HirId</code>.</td></tr>
+<tr><td>obligation              </td><td>  something that must be proven by the trait system (<a href="../traits/resolution.html">see more</a>)</td></tr>
+<tr><td>projection              </td><td>  a general term for a &quot;relative path&quot;, e.g. <code>x.f</code> is a &quot;field projection&quot;, and <code>T::Item</code> is an <a href="../traits/goals-and-clauses.html#trait-ref">&quot;associated type projection&quot;</a></td></tr>
+<tr><td>promoted constants      </td><td>  constants extracted from a function and lifted to static scope; see <a href="../mir/index.html#promoted">this section</a> for more details.</td></tr>
+<tr><td>provider                </td><td>  the function that executes a query (<a href="../query.html">see more</a>)</td></tr>
+<tr><td>quantified              </td><td>  in math or logic, existential and universal quantification are used to ask questions like &quot;is there any type T for which is true?&quot; or &quot;is this true for all types T?&quot;; see <a href="./background.html#quantified">the background chapter for more</a></td></tr>
+<tr><td>query                   </td><td>  perhaps some sub-computation during compilation (<a href="../query.html">see more</a>)</td></tr>
+<tr><td>region                  </td><td>  another term for &quot;lifetime&quot; often used in the literature and in the borrow checker.</td></tr>
+<tr><td>rib                     </td><td>  a data structure in the name resolver that keeps track of a single scope for names. (<a href="../name-resolution.html">see more</a>)</td></tr>
+<tr><td>sess                    </td><td>  the compiler session, which stores global data used throughout compilation</td></tr>
+<tr><td>side tables             </td><td>  because the AST and HIR are immutable once created, we often carry extra information about them in the form of hashtables, indexed by the id of a particular node.</td></tr>
+<tr><td>sigil                   </td><td>  like a keyword but composed entirely of non-alphanumeric tokens. For example, <code>&amp;</code> is a sigil for references.</td></tr>
+<tr><td>placeholder           </td><td>  <strong>NOTE: skolemization is deprecated by placeholder</strong> a way of handling subtyping around &quot;for-all&quot; types (e.g., <code>for&lt;'a&gt; fn(&amp;'a u32)</code>) as well as solving higher-ranked trait bounds (e.g., <code>for&lt;'a&gt; T: Trait&lt;'a&gt;</code>). See <a href="../borrow_check/region_inference.html#placeholder">the chapter on placeholder and universes</a> for more details.</td></tr>
+<tr><td>soundness               </td><td>  soundness is a technical term in type theory. Roughly, if a type system is sound, then if a program type-checks, it is type-safe; i.e. I can never (in safe rust) force a value into a variable of the wrong type. (see &quot;completeness&quot;).</td></tr>
+<tr><td>span                    </td><td>  a location in the user's source code, used for error reporting primarily. These are like a file-name/line-number/column tuple on steroids: they carry a start/end point, and also track macro expansions and compiler desugaring. All while being packed into a few bytes (really, it's an index into a table). See the Span datatype for more.</td></tr>
+<tr><td>substs                  </td><td>  the substitutions for a given generic type or item (e.g. the <code>i32</code>, <code>u32</code> in <code>HashMap&lt;i32, u32&gt;</code>)</td></tr>
+<tr><td>tcx                     </td><td>  the &quot;typing context&quot;, main data structure of the compiler (<a href="../ty.html">see more</a>)</td></tr>
+<tr><td>'tcx                    </td><td>  the lifetime of the currently active inference context (<a href="../ty.html">see more</a>)</td></tr>
+<tr><td>trait reference         </td><td>  the name of a trait along with a suitable set of input type/lifetimes (<a href="../traits/goals-and-clauses.html#trait-ref">see more</a>)</td></tr>
+<tr><td>token                   </td><td>  the smallest unit of parsing. Tokens are produced after lexing (<a href="../the-parser.html">see more</a>).</td></tr>
+<tr><td><a href="https://llvm.org/docs/LangRef.html#thread-local-storage-models">TLS</a>                   </td><td>  Thread-Local Storage. Variables may be defined so that each thread has its own copy (rather than all threads sharing the variable). This has some interactions with LLVM. Not all platforms support TLS.</td></tr>
+<tr><td>trans                   </td><td>  the code to translate MIR into LLVM IR. Renamed to codegen.</td></tr>
+<tr><td>trait reference         </td><td>  a trait and values for its type parameters (<a href="../ty.html">see more</a>).</td></tr>
+<tr><td>ty                      </td><td>  the internal representation of a type (<a href="../ty.html">see more</a>).</td></tr>
+<tr><td>UFCS                    </td><td>  Universal Function Call Syntax. An unambiguous syntax for calling a method (<a href="../type-checking.html">see more</a>).</td></tr>
+<tr><td>uninhabited type        </td><td>  a type which has <em>no</em> values. This is not the same as a ZST, which has exactly 1 value. An example of an uninhabited type is <code>enum Foo {}</code>, which has no variants, and so, can never be created. The compiler can treat code that deals with uninhabited types as dead code, since there is no such value to be manipulated. <code>!</code> (the never type) is an uninhabited type. Uninhabited types are also called &quot;empty types&quot;.</td></tr>
+<tr><td>upvar                   </td><td>  a variable captured by a closure from outside the closure.</td></tr>
+<tr><td>variance                </td><td>  variance determines how changes to a generic type/lifetime parameter affect subtyping; for example, if <code>T</code> is a subtype of <code>U</code>, then <code>Vec&lt;T&gt;</code> is a subtype <code>Vec&lt;U&gt;</code> because <code>Vec</code> is <em>covariant</em> in its generic parameter. See <a href="./background.html#variance">the background chapter</a> for a more general explanation. See the <a href="../variance.html">variance chapter</a> for an explanation of how type checking handles variance.</td></tr>
+<tr><td>Wide pointer            </td><td>  a pointer with additional metadata. See &quot;fat pointer&quot; for more.</td></tr>
+<tr><td>ZST                     </td><td>  Zero-Sized Type. A type whose values have size 0 bytes. Since <code>2^0 = 1</code>, such types can have exactly one value. For example, <code>()</code> (unit) is a ZST. <code>struct Foo;</code> is also a ZST. The compiler can do some nice optimizations around ZSTs.</td></tr>
+</tbody></table>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../appendix/background.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../appendix/code-index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../appendix/background.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../appendix/code-index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

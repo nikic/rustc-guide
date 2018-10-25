@@ -1,0 +1,486 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>How to build the compiler and run what you built - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html" class="active"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#how-to-build-the-compiler-and-run-what-you-built" id="how-to-build-the-compiler-and-run-what-you-built"><h1>How to build the compiler and run what you built</h1></a>
+<p>The compiler is built using a tool called <code>x.py</code>. You will need to
+have Python installed to run it. But before we get to that, if you're going to
+be hacking on <code>rustc</code>, you'll want to tweak the configuration of the compiler.
+The default configuration is oriented towards running the compiler as a user,
+not a developer.</p>
+<a class="header" href="#create-a-configtoml" id="create-a-configtoml"><h3>Create a config.toml</h3></a>
+<p>To start, copy <a href="https://github.com/rust-lang/rust/blob/master/config.toml.example"><code>config.toml.example</code></a> to <code>config.toml</code>:</p>
+<pre><code class="language-bash">&gt; cd $RUST_CHECKOUT
+&gt; cp config.toml.example config.toml
+</code></pre>
+<p>Then you will want to open up the file and change the following
+settings (and possibly others, such as <code>llvm.ccache</code>):</p>
+<pre><code class="language-toml">[llvm]
+# Enables LLVM assertions, which will check that the LLVM bitcode generated
+# by the compiler is internally consistent. These are particularly helpful
+# if you edit `trans`.
+assertions = true
+
+[rust]
+# This enables some assertions, but more importantly it enables the `debug!`
+# logging macros that are essential for debugging rustc.
+debug-assertions = true
+
+# This will make your build more parallel; it costs a bit of runtime
+# performance perhaps (less inlining) but it's worth it.
+codegen-units = 0
+
+# I always enable full debuginfo, though debuginfo-lines is more important.
+debuginfo = true
+
+# Gives you line numbers for backtraces.
+debuginfo-lines = true
+
+# Using the system allocator (instead of jemalloc) means that tools
+# like valgrind and memcache work better.
+use-jemalloc = false
+</code></pre>
+<a class="header" href="#what-is-xpy" id="what-is-xpy"><h3>What is x.py?</h3></a>
+<p>x.py is the script used to orchestrate the tooling in the rustc repository.
+It is the script that can build docs, run tests, and compile rustc.
+It is the now preferred way to build rustc and it replaces the old makefiles
+from before. Below are the different ways to utilize x.py in order to
+effectively deal with the repo for various common tasks.</p>
+<a class="header" href="#running-xpy-and-building-a-stage1-compiler" id="running-xpy-and-building-a-stage1-compiler"><h3>Running x.py and building a stage1 compiler</h3></a>
+<p>One thing to keep in mind is that <code>rustc</code> is a <em>bootstrapping</em>
+compiler. That is, since <code>rustc</code> is written in Rust, we need to use an
+older version of the compiler to compile the newer version. In
+particular, the newer version of the compiler, <code>libstd</code>, and other
+tooling may use some unstable features internally. The result is that
+compiling <code>rustc</code> is done in stages:</p>
+<ul>
+<li><strong>Stage 0:</strong> the stage0 compiler is usually the current <em>beta</em> compiler
+(<code>x.py</code> will download it for you); you can configure <code>x.py</code> to use something
+else, though.</li>
+<li><strong>Stage 1:</strong> the code in your clone (for new version) is then
+compiled with the stage0 compiler to produce the stage1 compiler.
+However, it was built with an older compiler (stage0), so to
+optimize the stage1 compiler we go to next stage.
+<ul>
+<li>(In theory, the stage1 compiler is functionally identical to the
+stage2 compiler, but in practice there are subtle differences. In
+particular, the stage1 compiler itself was built by stage0 and
+hence not by the source in your working directory: this means that
+the symbol names used in the compiler source may not match the
+symbol names that would have been made by the stage1 compiler.
+This can be important when using dynamic linking (e.g., with
+derives. Sometimes this means that some tests don't work when run
+with stage1.)</li>
+</ul>
+</li>
+<li><strong>Stage 2:</strong> we rebuild our stage1 compiler with itself to produce
+the stage2 compiler (i.e. it builds itself) to have all the <em>latest
+optimizations</em>. (By default, we copy the stage1 libraries for use by
+the stage2 compiler, since they ought to be identical.)</li>
+<li><em>(Optional)</em> <strong>Stage 3</strong>: to sanity check of our new compiler, we
+can build the libraries with the stage2 compiler. The result ought
+to be identical to before, unless something has broken.</li>
+</ul>
+<a class="header" href="#build-flags" id="build-flags"><h4>Build Flags</h4></a>
+<p>There are other flags you can pass to the build portion of x.py that can be
+beneficial to cutting down compile times or fitting other things you might
+need to change. They are:</p>
+<pre><code class="language-bash">Options:
+    -v, --verbose       use verbose output (-vv for very verbose)
+    -i, --incremental   use incremental compilation
+        --config FILE   TOML configuration file for build
+        --build BUILD   build target of the stage0 compiler
+        --host HOST     host targets to build
+        --target TARGET target targets to build
+        --on-fail CMD   command to run on failure
+        --stage N       stage to build
+        --keep-stage N  stage to keep without recompiling
+        --src DIR       path to the root of the rust checkout
+    -j, --jobs JOBS     number of jobs to run in parallel
+    -h, --help          print this help message
+</code></pre>
+<p>For hacking, often building the stage 1 compiler is enough, but for
+final testing and release, the stage 2 compiler is used.</p>
+<p><code>./x.py check</code> is really fast to build the rust compiler.
+It is, in particular, very useful when you're doing some kind of
+&quot;type-based refactoring&quot;, like renaming a method, or changing the
+signature of some function.</p>
+<p><a name=command></a></p>
+<p>Once you've created a config.toml, you are now ready to run
+<code>x.py</code>. There are a lot of options here, but let's start with what is
+probably the best &quot;go to&quot; command for building a local rust:</p>
+<pre><code class="language-bash">&gt; ./x.py build -i --stage 1 src/libstd
+</code></pre>
+<p>This may <em>look</em> like it only builds libstd, but that is not the case.
+What this command does is the following:</p>
+<ul>
+<li>Build libstd using the stage0 compiler (using incremental)</li>
+<li>Build librustc using the stage0 compiler (using incremental)
+<ul>
+<li>This produces the stage1 compiler</li>
+</ul>
+</li>
+<li>Build libstd using the stage1 compiler (cannot use incremental)</li>
+</ul>
+<p>This final product (stage1 compiler + libs built using that compiler)
+is what you need to build other rust programs.</p>
+<p>Note that the command includes the <code>-i</code> switch. This enables incremental
+compilation. This will be used to speed up the first two steps of the process:
+in particular, if you make a small change, we ought to be able to use your old
+results to make producing the stage1 <strong>compiler</strong> faster.</p>
+<p>Unfortunately, incremental cannot be used to speed up making the
+stage1 libraries.  This is because incremental only works when you run
+the <em>same compiler</em> twice in a row.  In this case, we are building a
+<em>new stage1 compiler</em> every time. Therefore, the old incremental
+results may not apply. <strong>As a result, you will probably find that
+building the stage1 libstd is a bottleneck for you</strong> -- but fear not,
+there is a (hacky) workaround.  See <a href="#workflow">the section on &quot;recommended
+workflows&quot;</a> below.</p>
+<p>Note that this whole command just gives you a subset of the full rustc
+build. The <strong>full</strong> rustc build (what you get if you just say <code>./x.py build</code>) has quite a few more steps:</p>
+<ul>
+<li>Build librustc and rustc with the stage1 compiler.
+<ul>
+<li>The resulting compiler here is called the &quot;stage2&quot; compiler.</li>
+</ul>
+</li>
+<li>Build libstd with stage2 compiler.</li>
+<li>Build librustdoc and a bunch of other things with the stage2 compiler.</li>
+</ul>
+<p><a name=toolchain></a></p>
+<a class="header" href="#build-specific-components" id="build-specific-components"><h3>Build specific components</h3></a>
+<p>Build only the libcore library</p>
+<pre><code class="language-bash">&gt; ./x.py build src/libcore
+</code></pre>
+<p>Build the libcore and libproc_macro library only</p>
+<pre><code class="language-bash">&gt; ./x.py build src/libcore src/libproc_macro
+</code></pre>
+<p>Build only libcore up to Stage 1</p>
+<pre><code class="language-bash">&gt; ./x.py build src/libcore --stage 1
+</code></pre>
+<p>Sometimes you might just want to test if the part you’re working on can
+compile. Using these commands you can test that it compiles before doing
+a bigger build to make sure it works with the compiler. As shown before
+you can also pass flags at the end such as --stage.</p>
+<a class="header" href="#creating-a-rustup-toolchain" id="creating-a-rustup-toolchain"><h3>Creating a rustup toolchain</h3></a>
+<p>Once you have successfully built rustc, you will have created a bunch
+of files in your <code>build</code> directory. In order to actually run the
+resulting rustc, we recommend creating rustup toolchains. The first
+one will run the stage1 compiler (which we built above). The second
+will execute the stage2 compiler (which we did not build, but which
+you will likely need to build at some point; for example, if you want
+to run the entire test suite).</p>
+<pre><code class="language-bash">&gt; rustup toolchain link stage1 build/&lt;host-triple&gt;/stage1
+&gt; rustup toolchain link stage2 build/&lt;host-triple&gt;/stage2
+</code></pre>
+<p>The <code>&lt;host-triple&gt;</code> would typically be one of the following:</p>
+<ul>
+<li>Linux: <code>x86_64-unknown-linux-gnu</code></li>
+<li>Mac: <code>x86_64-apple-darwin</code></li>
+<li>Windows: <code>x86_64-pc-windows-msvc</code></li>
+</ul>
+<p>Now you can run the rustc you built with. If you run with <code>-vV</code>, you
+should see a version number ending in <code>-dev</code>, indicating a build from
+your local environment:</p>
+<pre><code class="language-bash">&gt; rustc +stage1 -vV
+rustc 1.25.0-dev
+binary: rustc
+commit-hash: unknown
+commit-date: unknown
+host: x86_64-unknown-linux-gnu
+release: 1.25.0-dev
+LLVM version: 4.0
+</code></pre>
+<p><a name=workflow></a></p>
+<a class="header" href="#suggested-workflows-for-faster-builds-of-the-compiler" id="suggested-workflows-for-faster-builds-of-the-compiler"><h3>Suggested workflows for faster builds of the compiler</h3></a>
+<p>There are two workflows that are useful for faster builds of the
+compiler.</p>
+<p><strong>Check, check, and check again.</strong> The first workflow, which is useful
+when doing simple refactorings, is to run <code>./x.py check</code>
+continuously. Here you are just checking that the compiler can
+<strong>build</strong>, but often that is all you need (e.g., when renaming a
+method). You can then run <code>./x.py build</code> when you actually need to
+run tests.</p>
+<p>In fact, it is sometimes useful to put off tests even when you are not
+100% sure the code will work. You can then keep building up
+refactoring commits and only run the tests at some later time. You can
+then use <code>git bisect</code> to track down <strong>precisely</strong> which commit caused
+the problem. A nice side-effect of this style is that you are left
+with a fairly fine-grained set of commits at the end, all of which
+build and pass tests. This often helps reviewing.</p>
+<p><strong>Incremental builds with <code>--keep-stage</code>.</strong> Sometimes just checking
+whether the compiler builds is not enough. A common example is that
+you need to add a <code>debug!</code> statement to inspect the value of some
+state or better understand the problem. In that case, you really need
+a full build.  By leveraging incremental, though, you can often get
+these builds to complete very fast (e.g., around 30 seconds): the only
+catch is this requires a bit of fudging and may produce compilers that
+don't work (but that is easily detected and fixed).</p>
+<p>The sequence of commands you want is as follows:</p>
+<ul>
+<li>Initial build: <code>./x.py build -i --stage 1 src/libstd</code>
+<ul>
+<li>As <a href="#command">documented above</a>, this will build a functional
+stage1 compiler</li>
+</ul>
+</li>
+<li>Subsequent builds: <code>./x.py build -i --stage 1 src/libstd --keep-stage 1</code>
+<ul>
+<li>Note that we added the <code>--keep-stage 1</code> flag here</li>
+</ul>
+</li>
+</ul>
+<p>The effect of <code>--keep-stage 1</code> is that we just <em>assume</em> that the old
+standard library can be re-used. If you are editing the compiler, this
+is almost always true: you haven't changed the standard library, after
+all.  But sometimes, it's not true: for example, if you are editing
+the &quot;metadata&quot; part of the compiler, which controls how the compiler
+encodes types and other states into the <code>rlib</code> files, or if you are
+editing things that wind up in the metadata (such as the definition of
+the MIR).</p>
+<p><strong>The TL;DR is that you might get weird behavior from a compile when
+using <code>--keep-stage 1</code></strong> -- for example, strange
+<a href="appendix/glossary.html">ICEs</a> or other panics. In that case, you
+should simply remove the <code>--keep-stage 1</code> from the command and
+rebuild.  That ought to fix the problem.</p>
+<p>You can also use <code>--keep-stage 1</code> when running tests. Something like
+this:</p>
+<ul>
+<li>Initial test run: <code>./x.py test -i --stage 1 src/test/ui</code></li>
+<li>Subsequent test run: <code>./x.py test -i --stage 1 src/test/ui --keep-stage 1</code></li>
+</ul>
+<a class="header" href="#other-xpy-commands" id="other-xpy-commands"><h3>Other x.py commands</h3></a>
+<p>Here are a few other useful x.py commands. We'll cover some of them in detail
+in other sections:</p>
+<ul>
+<li>Building things:
+<ul>
+<li><code>./x.py clean</code> – clean up the build directory (<code>rm -rf build</code> works too,
+but then you have to rebuild LLVM)</li>
+<li><code>./x.py build --stage 1</code> – builds everything using the stage 1 compiler,
+not just up to libstd</li>
+<li><code>./x.py build</code> – builds the stage2 compiler</li>
+</ul>
+</li>
+<li>Running tests (see the <a href="./tests/running.html">section on running tests</a> for
+more details):
+<ul>
+<li><code>./x.py test --stage 1 src/libstd</code> – runs the <code>#[test]</code> tests from libstd</li>
+<li><code>./x.py test --stage 1 src/test/run-pass</code> – runs the <code>run-pass</code> test suite</li>
+</ul>
+</li>
+</ul>
+<a class="header" href="#ctags" id="ctags"><h3>ctags</h3></a>
+<p>One of the challenges with rustc is that the RLS can't handle it, making code
+navigation difficult. One solution is to use <code>ctags</code>. The following script can
+be used to set it up: <a href="https://github.com/nikomatsakis/rust-etags">https://github.com/nikomatsakis/rust-etags</a>.</p>
+<p>CTAGS integrates into emacs and vim quite easily. The following can then be
+used to build and generate tags:</p>
+<pre><code class="language-console">$ rust-ctags src/lib* &amp;&amp; ./x.py build &lt;something&gt;
+</code></pre>
+<p>This allows you to do &quot;jump-to-def&quot; with whatever functions were around when
+you last built, which is ridiculously useful.</p>
+<a class="header" href="#cleaning-out-build-directories" id="cleaning-out-build-directories"><h3>Cleaning out build directories</h3></a>
+<p>Sometimes you need to start fresh, but this is normally not the case.
+If you need to run this then rustbuild is most likely not acting right and
+you should file a bug as to what is going wrong. If you do need to clean
+everything up then you only need to run one command!</p>
+<pre><code class="language-bash">&gt; ./x.py clean
+</code></pre>
+<a class="header" href="#compiler-documentation" id="compiler-documentation"><h3>Compiler Documentation</h3></a>
+<p>The documentation for the rust components are found at <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/">rustc doc</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="compiler-team.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="build-install-distribution-artifacts.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="compiler-team.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="build-install-distribution-artifacts.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

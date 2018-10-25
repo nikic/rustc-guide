@@ -1,0 +1,458 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Queries: demand-driven compilation - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html" class="active"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#queries-demand-driven-compilation" id="queries-demand-driven-compilation"><h1>Queries: demand-driven compilation</h1></a>
+<p>As described in <a href="high-level-overview.html">the high-level overview of the compiler</a>, the
+Rust compiler is current transitioning from a traditional &quot;pass-based&quot;
+setup to a &quot;demand-driven&quot; system. <strong>The Compiler Query System is the
+key to our new demand-driven organization.</strong> The idea is pretty
+simple. You have various queries that compute things about the input
+– for example, there is a query called <code>type_of(def_id)</code> that, given
+the def-id of some item, will compute the type of that item and return
+it to you.</p>
+<p>Query execution is <strong>memoized</strong> – so the first time you invoke a
+query, it will go do the computation, but the next time, the result is
+returned from a hashtable. Moreover, query execution fits nicely into
+<strong>incremental computation</strong>; the idea is roughly that, when you do a
+query, the result <strong>may</strong> be returned to you by loading stored data
+from disk (but that's a separate topic we won't discuss further here).</p>
+<p>The overall vision is that, eventually, the entire compiler
+control-flow will be query driven. There will effectively be one
+top-level query (&quot;compile&quot;) that will run compilation on a crate; this
+will in turn demand information about that crate, starting from the
+<em>end</em>.  For example:</p>
+<ul>
+<li>This &quot;compile&quot; query might demand to get a list of codegen-units
+(i.e. modules that need to be compiled by LLVM).</li>
+<li>But computing the list of codegen-units would invoke some subquery
+that returns the list of all modules defined in the Rust source.</li>
+<li>That query in turn would invoke something asking for the HIR.</li>
+<li>This keeps going further and further back until we wind up doing the
+actual parsing.</li>
+</ul>
+<p>However, that vision is not fully realized. Still, big chunks of the
+compiler (for example, generating MIR) work exactly like this.</p>
+<a class="header" href="#invoking-queries" id="invoking-queries"><h3>Invoking queries</h3></a>
+<p>To invoke a query is simple. The tcx (&quot;type context&quot;) offers a method
+for each defined query. So, for example, to invoke the <code>type_of</code>
+query, you would just do this:</p>
+<pre><code class="language-rust ignore">let ty = tcx.type_of(some_def_id);
+</code></pre>
+<a class="header" href="#cycles-between-queries" id="cycles-between-queries"><h3>Cycles between queries</h3></a>
+<p>A cycle is when a query becomes stuck in a loop e.g. query A generates query B
+which generates query A again.</p>
+<p>Currently, cycles during query execution should always result in a
+compilation error. Typically, they arise because of illegal programs
+that contain cyclic references they shouldn't (though sometimes they
+arise because of compiler bugs, in which case we need to factor our
+queries in a more fine-grained fashion to avoid them).</p>
+<p>However, it is nonetheless often useful to <em>recover</em> from a cycle
+(after reporting an error, say) and try to soldier on, so as to give a
+better user experience. In order to recover from a cycle, you don't
+get to use the nice method-call-style syntax. Instead, you invoke
+using the <code>try_get</code> method, which looks roughly like this:</p>
+<pre><code class="language-rust ignore">use ty::queries;
+...
+match queries::type_of::try_get(tcx, DUMMY_SP, self.did) {
+  Ok(result) =&gt; {
+    // no cycle occurred! You can use `result`
+  }
+  Err(err) =&gt; {
+    // A cycle occurred! The error value `err` is a `DiagnosticBuilder`,
+    // meaning essentially an &quot;in-progress&quot;, not-yet-reported error message.
+    // See below for more details on what to do here.
+  }
+}
+</code></pre>
+<p>So, if you get back an <code>Err</code> from <code>try_get</code>, then a cycle <em>did</em> occur. This
+means that you must ensure that a compiler error message is reported. You can
+do that in two ways:</p>
+<p>The simplest is to invoke <code>err.emit()</code>. This will emit the cycle error to the
+user.</p>
+<p>However, often cycles happen because of an illegal program, and you
+know at that point that an error either already has been reported or
+will be reported due to this cycle by some other bit of code. In that
+case, you can invoke <code>err.cancel()</code> to not emit any error. It is
+traditional to then invoke:</p>
+<pre><code class="language-rust ignore">tcx.sess.delay_span_bug(some_span, &quot;some message&quot;)
+</code></pre>
+<p><code>delay_span_bug()</code> is a helper that says: we expect a compilation
+error to have happened or to happen in the future; so, if compilation
+ultimately succeeds, make an ICE with the message <code>&quot;some message&quot;</code>. This is basically just a precaution in case you are wrong.</p>
+<a class="header" href="#how-the-compiler-executes-a-query" id="how-the-compiler-executes-a-query"><h3>How the compiler executes a query</h3></a>
+<p>So you may be wondering what happens when you invoke a query
+method. The answer is that, for each query, the compiler maintains a
+cache – if your query has already been executed, then, the answer is
+simple: we clone the return value out of the cache and return it
+(therefore, you should try to ensure that the return types of queries
+are cheaply cloneable; insert a <code>Rc</code> if necessary).</p>
+<a class="header" href="#providers" id="providers"><h4>Providers</h4></a>
+<p>If, however, the query is <em>not</em> in the cache, then the compiler will
+try to find a suitable <strong>provider</strong>. A provider is a function that has
+been defined and linked into the compiler somewhere that contains the
+code to compute the result of the query.</p>
+<p><strong>Providers are defined per-crate.</strong> The compiler maintains,
+internally, a table of providers for every crate, at least
+conceptually. Right now, there are really two sets: the providers for
+queries about the <strong>local crate</strong> (that is, the one being compiled)
+and providers for queries about <strong>external crates</strong> (that is,
+dependencies of the local crate). Note that what determines the crate
+that a query is targeting is not the <em>kind</em> of query, but the <em>key</em>.
+For example, when you invoke <code>tcx.type_of(def_id)</code>, that could be a
+local query or an external query, depending on what crate the <code>def_id</code>
+is referring to (see the <code>self::keys::Key</code> trait for more information
+on how that works).</p>
+<p>Providers always have the same signature:</p>
+<pre><code class="language-rust ignore">fn provider&lt;'cx, 'tcx&gt;(tcx: TyCtxt&lt;'cx, 'tcx, 'tcx&gt;,
+                       key: QUERY_KEY)
+                       -&gt; QUERY_RESULT
+{
+    ...
+}
+</code></pre>
+<p>Providers take two arguments: the <code>tcx</code> and the query key. Note also
+that they take the <em>global</em> tcx (i.e. they use the <code>'tcx</code> lifetime
+twice), rather than taking a tcx with some active inference context.
+They return the result of the query.</p>
+<a class="header" href="#how-providers-are-setup" id="how-providers-are-setup"><h4>How providers are setup</h4></a>
+<p>When the tcx is created, it is given the providers by its creator using
+the <code>Providers</code> struct. This struct is generated by the macros here, but it
+is basically a big list of function pointers:</p>
+<pre><code class="language-rust ignore">struct Providers {
+    type_of: for&lt;'cx, 'tcx&gt; fn(TyCtxt&lt;'cx, 'tcx, 'tcx&gt;, DefId) -&gt; Ty&lt;'tcx&gt;,
+    ...
+}
+</code></pre>
+<p>At present, we have one copy of the struct for local crates, and one
+for external crates, though the plan is that we may eventually have
+one per crate.</p>
+<p>These <code>Provider</code> structs are ultimately created and populated by
+<code>librustc_driver</code>, but it does this by distributing the work
+throughout the other <code>rustc_*</code> crates. This is done by invoking
+various <code>provide</code> functions. These functions tend to look something
+like this:</p>
+<pre><code class="language-rust ignore">pub fn provide(providers: &amp;mut Providers) {
+    *providers = Providers {
+        type_of,
+        ..*providers
+    };
+}
+</code></pre>
+<p>That is, they take an <code>&amp;mut Providers</code> and mutate it in place. Usually
+we use the formulation above just because it looks nice, but you could
+as well do <code>providers.type_of = type_of</code>, which would be equivalent.
+(Here, <code>type_of</code> would be a top-level function, defined as we saw
+before.) So, if we want to add a provider for some other query,
+let's call it <code>fubar</code>, into the crate above, we might modify the <code>provide()</code>
+function like so:</p>
+<pre><code class="language-rust ignore">pub fn provide(providers: &amp;mut Providers) {
+    *providers = Providers {
+        type_of,
+        fubar,
+        ..*providers
+    };
+}
+
+fn fubar&lt;'cx, 'tcx&gt;(tcx: TyCtxt&lt;'cx, 'tcx&gt;, key: DefId) -&gt; Fubar&lt;'tcx&gt; { ... }
+</code></pre>
+<p>N.B. Most of the <code>rustc_*</code> crates only provide <strong>local
+providers</strong>. Almost all <strong>extern providers</strong> wind up going through the
+<a href="https://github.com/rust-lang/rust/tree/master/src/librustc_metadata"><code>rustc_metadata</code> crate</a>, which loads the information from the
+crate metadata. But in some cases there are crates that provide queries for
+<em>both</em> local and external crates, in which case they define both a
+<code>provide</code> and a <code>provide_extern</code> function that <code>rustc_driver</code> can
+invoke.</p>
+<a class="header" href="#adding-a-new-kind-of-query" id="adding-a-new-kind-of-query"><h3>Adding a new kind of query</h3></a>
+<p>So suppose you want to add a new kind of query, how do you do so?
+Well, defining a query takes place in two steps:</p>
+<ol>
+<li>first, you have to specify the query name and arguments; and then,</li>
+<li>you have to supply query providers where needed.</li>
+</ol>
+<p>To specify the query name and arguments, you simply add an entry to
+the big macro invocation in
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/ty/query/index.html"><code>src/librustc/ty/query/mod.rs</code></a>, which looks something like:</p>
+<pre><code class="language-rust ignore">define_queries! { &lt;'tcx&gt;
+    /// Records the type of every item.
+    [] fn type_of: TypeOfItem(DefId) -&gt; Ty&lt;'tcx&gt;,
+
+    ...
+}
+</code></pre>
+<p>Each line of the macro defines one query. The name is broken up like this:</p>
+<pre><code class="language-rust ignore">[] fn type_of: TypeOfItem(DefId) -&gt; Ty&lt;'tcx&gt;,
+^^    ^^^^^^^  ^^^^^^^^^^ ^^^^^     ^^^^^^^^
+|     |        |          |         |
+|     |        |          |         result type of query
+|     |        |          query key type
+|     |        dep-node constructor
+|     name of query
+query flags
+</code></pre>
+<p>Let's go over them one by one:</p>
+<ul>
+<li><strong>Query flags:</strong> these are largely unused right now, but the intention
+is that we'll be able to customize various aspects of how the query is
+processed.</li>
+<li><strong>Name of query:</strong> the name of the query method
+(<code>tcx.type_of(..)</code>). Also used as the name of a struct
+(<code>ty::queries::type_of</code>) that will be generated to represent
+this query.</li>
+<li><strong>Dep-node constructor:</strong> indicates the constructor function that
+connects this query to incremental compilation. Typically, this is a
+<code>DepNode</code> variant, which can be added by modifying the
+<code>define_dep_nodes!</code> macro invocation in
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/dep_graph/struct.DepNode.html"><code>librustc/dep_graph/dep_node.rs</code></a>.
+<ul>
+<li>However, sometimes we use a custom function, in which case the
+name will be in snake case and the function will be defined at the
+bottom of the file. This is typically used when the query key is
+not a def-id, or just not the type that the dep-node expects.</li>
+</ul>
+</li>
+<li><strong>Query key type:</strong> the type of the argument to this query.
+This type must implement the <code>ty::query::keys::Key</code> trait, which
+defines (for example) how to map it to a crate, and so forth.</li>
+<li><strong>Result type of query:</strong> the type produced by this query. This type
+should (a) not use <code>RefCell</code> or other interior mutability and (b) be
+cheaply cloneable. Interning or using <code>Rc</code> or <code>Arc</code> is recommended for
+non-trivial data types.
+<ul>
+<li>The one exception to those rules is the <code>ty::steal::Steal</code> type,
+which is used to cheaply modify MIR in place. See the definition
+of <code>Steal</code> for more details. New uses of <code>Steal</code> should <strong>not</strong> be
+added without alerting <code>@rust-lang/compiler</code>.</li>
+</ul>
+</li>
+</ul>
+<p>So, to add a query:</p>
+<ul>
+<li>Add an entry to <code>define_queries!</code> using the format above.</li>
+<li>Possibly add a corresponding entry to the dep-node macro.</li>
+<li>Link the provider by modifying the appropriate <code>provide</code> method;
+or add a new one if needed and ensure that <code>rustc_driver</code> is invoking it.</li>
+</ul>
+<a class="header" href="#query-structs-and-descriptions" id="query-structs-and-descriptions"><h4>Query structs and descriptions</h4></a>
+<p>For each kind, the <code>define_queries</code> macro will generate a &quot;query struct&quot;
+named after the query. This struct is a kind of a place-holder
+describing the query. Each such struct implements the
+<code>self::config::QueryConfig</code> trait, which has associated types for the
+key/value of that particular query. Basically the code generated looks something
+like this:</p>
+<pre><code class="language-rust ignore">// Dummy struct representing a particular kind of query:
+pub struct type_of&lt;'tcx&gt; { phantom: PhantomData&lt;&amp;'tcx ()&gt; }
+
+impl&lt;'tcx&gt; QueryConfig for type_of&lt;'tcx&gt; {
+  type Key = DefId;
+  type Value = Ty&lt;'tcx&gt;;
+}
+</code></pre>
+<p>There is an additional trait that you may wish to implement called
+<code>self::config::QueryDescription</code>. This trait is used during cycle
+errors to give a &quot;human readable&quot; name for the query, so that we can
+summarize what was happening when the cycle occurred. Implementing
+this trait is optional if the query key is <code>DefId</code>, but if you <em>don't</em>
+implement it, you get a pretty generic error (&quot;processing <code>foo</code>...&quot;).
+You can put new impls into the <code>config</code> module. They look something like this:</p>
+<pre><code class="language-rust ignore">impl&lt;'tcx&gt; QueryDescription for queries::type_of&lt;'tcx&gt; {
+    fn describe(tcx: TyCtxt, key: DefId) -&gt; String {
+        format!(&quot;computing the type of `{}`&quot;, tcx.item_path_str(key))
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="rustdoc.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="incremental-compilation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="rustdoc.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="incremental-compilation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

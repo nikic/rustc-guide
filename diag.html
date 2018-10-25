@@ -1,0 +1,421 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Emitting Diagnostics - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html" class="active"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#emitting-diagnostics" id="emitting-diagnostics"><h1>Emitting Diagnostics</h1></a>
+<p>A lot of effort has been put into making <code>rustc</code> have great error messages.
+This chapter is about how to emit compile errors and lints from the compiler.</p>
+<a class="header" href="#span" id="span"><h2><code>Span</code></h2></a>
+<p><a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/source_map/struct.Span.html"><code>Span</code></a> is the primary data structure in <code>rustc</code> used to represent a
+location in the code being compiled. <code>Span</code>s are attached to most constructs in
+HIR and MIR, allowing for more informative error reporting.</p>
+<p>A <code>Span</code> can be looked up in a <a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/source_map/struct.SourceMap.html"><code>SourceMap</code></a> to get a &quot;snippet&quot;
+useful for displaying errors with <a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/source_map/struct.SourceMap.html#method.span_to_snippet"><code>span_to_snippet</code></a> and other
+similar methods on the <code>SourceMap</code>.</p>
+<a class="header" href="#error-messages" id="error-messages"><h2>Error messages</h2></a>
+<p>The <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/index.html"><code>rustc_errors</code></a> crate defines most of the utilities used for
+reporting errors.</p>
+<p><a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/session/struct.Session.html"><code>Session</code></a> and <a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/parse/struct.ParseSess.html"><code>ParseSess</code></a> have
+methods (or fields with methods) that allow reporting errors. These methods
+usually have names like <code>span_err</code> or <code>struct_span_err</code> or <code>span_warn</code>, etc...
+There are lots of them; they emit different types of &quot;errors&quot;, such as
+warnings, errors, fatal errors, suggestions, etc.</p>
+<p>In general, there are two class of such methods: ones that emit an error
+directly and ones that allow finer control over what to emit. For example,
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/session/struct.Session.html#method.span_err"><code>span_err</code></a> emits the given error message at the given <code>Span</code>, but
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/session/struct.Session.html#method.struct_span_err"><code>struct_span_err</code></a> instead returns a
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/diagnostic_builder/struct.DiagnosticBuilder.html"><code>DiagnosticBuilder</code></a>.</p>
+<p><code>DiagnosticBuilder</code> allows you to add related notes and suggestions to an error
+before emitting it by calling the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/diagnostic_builder/struct.DiagnosticBuilder.html#method.emit"><code>emit</code></a> method. (Failing to either
+emit or <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/struct.Diagnostic.html#method.cancel">cancel</a> a <code>DiagnosticBuilder</code> will result in an ICE.) See the
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/diagnostic_builder/struct.DiagnosticBuilder.html">docs</a> for more info on what you can do.</p>
+<pre><code class="language-rust ignore">// Get a DiagnosticBuilder. This does _not_ emit an error yet.
+let mut err = sess.struct_span_err(sp, &quot;oh no! this is an error!&quot;);
+
+// In some cases, you might need to check if `sp` is generated by a macro to
+// avoid printing weird errors about macro-generated code.
+
+if let Ok(snippet) = sess.source_map().span_to_snippet(sp) {
+    // Use the snippet to generate a suggested fix
+    err.span_suggestion(suggestion_sp, &quot;try using a qux here&quot;, format!(&quot;qux {}&quot;, snip));
+} else {
+    // If we weren't able to generate a snippet, then emit a &quot;help&quot; message
+    // instead of a concrete &quot;suggestion&quot;. In practice this is unlikely to be
+    // reached.
+    err.span_help(suggestion_sp, &quot;you could use a qux here instead&quot;);
+}
+
+// emit the error
+err.emit();
+</code></pre>
+<a class="header" href="#suggestions" id="suggestions"><h2>Suggestions</h2></a>
+<p>In addition to telling the user exactly <em>why</em> their code is wrong, it's
+oftentimes furthermore possible to tell them how to fix it. To this end,
+<code>DiagnosticBuilder</code> offers a structured suggestions API, which formats code
+suggestions pleasingly in the terminal, or (when the <code>--error-format json</code> flag
+is passed) as JSON for consumption by tools, most notably the <a href="https://github.com/rust-lang-nursery/rls">Rust Language
+Server</a> and <a href="https://github.com/rust-lang-nursery/rustfix"><code>rustfix</code></a>.</p>
+<p>Not all suggestions should be applied mechanically. Use the
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/struct.DiagnosticBuilder.html#method.span_suggestion_with_applicability"><code>span_suggestion_with_applicability</code></a> method of <code>DiagnosticBuilder</code> to
+make a suggestion while providing a hint to tools whether the suggestion is
+mechanically applicable or not.</p>
+<p>For example, to make our <code>qux</code> suggestion machine-applicable, we would do:</p>
+<pre><code class="language-rust ignore">let mut err = sess.struct_span_err(sp, &quot;oh no! this is an error!&quot;);
+
+if let Ok(snippet) = sess.source_map().span_to_snippet(sp) {
+    // Add applicability info!
+    err.span_suggestion_with_applicability(
+        suggestion_sp,
+        &quot;try using a qux here&quot;,
+        format!(&quot;qux {}&quot;, snip),
+        Applicability::MachineApplicable,
+    );
+} else {
+    err.span_help(suggestion_sp, &quot;you could use a qux here instead&quot;);
+}
+
+err.emit();
+</code></pre>
+<p>This might emit an error like</p>
+<pre><code class="language-console">$ rustc mycode.rs
+error[E0999]: oh no! this is an error!
+ --&gt; mycode.rs:3:5
+  |
+3 |     sad()
+  |     ^ help: try using a qux here: `qux sad()`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0999`.
+</code></pre>
+<p>In some cases, like when the suggestion spans multiple lines or when there are
+multiple suggestions, the suggestions are displayed on their own:</p>
+<pre><code class="language-console">error[E0999]: oh no! this is an error!
+ --&gt; mycode.rs:3:5
+  |
+3 |     sad()
+  |     ^
+help: try using a qux here:
+  |
+3 |     qux sad()
+  |     ^^^
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0999`.
+</code></pre>
+<p>There are a few other <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_errors/enum.Applicability.html"><code>Applicability</code></a> possibilities:</p>
+<ul>
+<li><code>MachineApplicable</code>: Can be applied mechanically.</li>
+<li><code>HasPlaceholders</code>: Cannot be applied mechanically because it has placeholder
+text in the suggestions. For example, &quot;Try adding a type: `let x:
+&lt;type&gt;`&quot;.</li>
+<li><code>MaybeIncorrect</code>: Cannot be applied mechanically because the suggestion may
+or may not be a good one.</li>
+<li><code>Unspecified</code>: Cannot be applied mechanically because we don't know which
+of the above cases it falls into.</li>
+</ul>
+<a class="header" href="#lints" id="lints"><h2>Lints</h2></a>
+<p>The compiler linting infrastructure is defined in the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/lint/index.html"><code>rustc::lint</code></a>
+module.</p>
+<a class="header" href="#declaring-a-lint" id="declaring-a-lint"><h3>Declaring a lint</h3></a>
+<p>The built-in compiler lints are defined in the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/index.html"><code>rustc_lint</code></a>
+crate.</p>
+<p>Each lint is defined as a <code>struct</code> that implements the <code>LintPass</code> <code>trait</code>. The
+trait implementation allows you to check certain syntactic constructs the
+linter walks the source code. You can then choose to emit lints in a very
+similar way to compile errors. Finally, you register the lint to actually get
+it to be run by the compiler by using the <code>declare_lint!</code> macro.</p>
+<p>For example, the following lint checks for uses
+of <code>while true { ... }</code> and suggests using <code>loop { ... }</code> instead.</p>
+<pre><code class="language-rust ignore">// Declare a lint called `WHILE_TRUE`
+declare_lint! {
+    WHILE_TRUE,
+
+    // warn-by-default
+    Warn,
+
+    // This string is the lint description
+    &quot;suggest using `loop { }` instead of `while true { }`&quot;
+}
+
+// Define a struct and `impl LintPass` for it.
+#[derive(Copy, Clone)]
+pub struct WhileTrue;
+
+impl LintPass for WhileTrue {
+    fn get_lints(&amp;self) -&gt; LintArray {
+        lint_array!(WHILE_TRUE)
+    }
+}
+
+// LateLintPass has lots of methods. We only override the definition of
+// `check_expr` for this lint because that's all we need, but you could
+// override other methods for your own lint. See the rustc docs for a full
+// list of methods.
+impl&lt;'a, 'tcx&gt; LateLintPass&lt;'a, 'tcx&gt; for WhileTrue {
+    fn check_expr(&amp;mut self, cx: &amp;LateContext, e: &amp;hir::Expr) {
+        if let hir::ExprWhile(ref cond, ..) = e.node {
+            if let hir::ExprLit(ref lit) = cond.node {
+                if let ast::LitKind::Bool(true) = lit.node {
+                    if lit.span.ctxt() == SyntaxContext::empty() {
+                        let msg = &quot;denote infinite loops with `loop { ... }`&quot;;
+                        let condition_span = cx.tcx.sess.source_map().def_span(e.span);
+                        let mut err = cx.struct_span_lint(WHILE_TRUE, condition_span, msg);
+                        err.span_suggestion_short(condition_span, &quot;use `loop`&quot;, &quot;loop&quot;.to_owned());
+                        err.emit();
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<a class="header" href="#edition-gated-lints" id="edition-gated-lints"><h3>Edition-gated Lints</h3></a>
+<p>Sometimes we want to change the behavior of a lint in a new edition. To do this,
+we just add the transition to our invocation of <code>declare_lint!</code>:</p>
+<pre><code class="language-rust ignore">declare_lint! {
+    pub ANONYMOUS_PARAMETERS,
+    Allow,
+    &quot;detects anonymous parameters&quot;,
+    Edition::Edition2018 =&gt; Warn,
+}
+</code></pre>
+<p>This makes the <code>ANONYMOUS_PARAMETERS</code> lint allow-by-default in the 2015 edition
+but warn-by-default in the 2018 edition.</p>
+<p>Lints that represent an incompatibility (i.e. error) in the upcoming edition
+should also be registered as <code>FutureIncompatibilityLint</code>s in
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/fn.register_builtins.html"><code>register_builtins</code></a> function in <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/index.html"><code>rustc_lint::lib</code></a>.</p>
+<a class="header" href="#lint-groups" id="lint-groups"><h3>Lint Groups</h3></a>
+<p>Lints can be turned on in groups. These groups are declared in the
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/fn.register_builtins.html"><code>register_builtins</code></a> function in <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/index.html"><code>rustc_lint::lib</code></a>. The
+<code>add_lint_group!</code> macro is used to declare a new group.</p>
+<p>For example,</p>
+<pre><code class="language-rust ignore">    add_lint_group!(sess,
+                    &quot;nonstandard_style&quot;,
+                    NON_CAMEL_CASE_TYPES,
+                    NON_SNAKE_CASE,
+                    NON_UPPER_CASE_GLOBALS);
+</code></pre>
+<p>This defines the <code>nonstandard_style</code> group which turns on the listed lints. A
+user can turn on these lints with a <code>!#[warn(nonstandard_style)]</code> attribute in
+the source code, or by passing <code>-W nonstandard-style</code> on the command line.</p>
+<a class="header" href="#linting-early-in-the-compiler" id="linting-early-in-the-compiler"><h3>Linting early in the compiler</h3></a>
+<p>On occasion, you may need to define a lint that runs before the linting system
+has been initialized (e.g. during parsing or macro expansion). This is
+problematic because we need to have computed lint levels to know whether we
+should emit a warning or an error or nothing at all.</p>
+<p>To solve this problem, we buffer the lints until the linting system is
+processed. <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/session/struct.Session.html#method.buffer_lint"><code>Session</code></a> and <a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/parse/struct.ParseSess.html#method.buffer_lint"><code>ParseSess</code></a> both have
+<code>buffer_lint</code> methods that allow you to buffer a lint for later. The linting
+system automatically takes care of handling buffered lints later.</p>
+<p>Thus, to define a lint that runs early in the compilation, one defines a lint
+like normal but invokes the lint with <code>buffer_lint</code>.</p>
+<a class="header" href="#linting-even-earlier-in-the-compiler" id="linting-even-earlier-in-the-compiler"><h4>Linting even earlier in the compiler</h4></a>
+<p>The parser (<code>libsyntax</code>) is interesting in that it cannot have dependencies on
+any of the other <code>librustc*</code> crates. In particular, it cannot depend on
+<code>librustc::lint</code> or <code>librustc_lint</code>, where all of the compiler linting
+infrastructure is defined. That's troublesome!</p>
+<p>To solve this, <code>libsyntax</code> defines its own buffered lint type, which
+<code>ParseSess::buffer_lint</code> uses. After macro expansion, these buffered lints are
+then dumped into the <code>Session::buffered_lints</code> used by the rest of the compiler.</p>
+<p>Usage for buffered lints in <code>libsyntax</code> is pretty much the same as the rest of
+the compiler with one exception because we cannot import the <code>LintId</code>s for
+lints we want to emit. Instead, the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/syntax/early_buffered_lints/enum.BufferedEarlyLintId.html"><code>BufferedEarlyLintId</code></a> type is used. If you
+are defining a new lint, you will want to add an entry to this enum. Then, add
+an appropriate mapping to the body of <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc/lint/struct.Lint.html#from_parser_lint_id"><code>Lint::from_parser_lint_id</code></a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="codegen.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="appendix/stupid-stats.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="codegen.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="appendix/stupid-stats.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

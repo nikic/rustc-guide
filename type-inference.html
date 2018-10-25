@@ -1,0 +1,386 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Type inference - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html" class="active"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#type-inference" id="type-inference"><h1>Type inference</h1></a>
+<p>Type inference is the process of automatic detection of the type of an
+expression.</p>
+<p>It is what allows Rust to work with fewer or no type annotations,
+making things easier for users:</p>
+<pre><code class="language-rust ignore">fn main() {
+    let mut things = vec![];
+    things.push(&quot;thing&quot;)
+}
+</code></pre>
+<p>Here, the type of <code>things</code> is <em>inferenced</em> to be <code>&amp;str</code> because that's the value
+we push into <code>things</code>.</p>
+<p>The type inference is based on the standard Hindley-Milner (HM) type inference
+algorithm, but extended in various way to accommodate subtyping, region
+inference, and higher-ranked types.</p>
+<a class="header" href="#a-note-on-terminology" id="a-note-on-terminology"><h2>A note on terminology</h2></a>
+<p>We use the notation <code>?T</code> to refer to inference variables, also called
+existential variables.</p>
+<p>We use the terms &quot;region&quot; and &quot;lifetime&quot; interchangeably. Both refer to
+the <code>'a</code> in <code>&amp;'a T</code>.</p>
+<p>The term &quot;bound region&quot; refers to a region that is bound in a function
+signature, such as the <code>'a</code> in <code>for&lt;'a&gt; fn(&amp;'a u32)</code>. A region is
+&quot;free&quot; if it is not bound.</p>
+<a class="header" href="#creating-an-inference-context" id="creating-an-inference-context"><h2>Creating an inference context</h2></a>
+<p>You create and &quot;enter&quot; an inference context by doing something like
+the following:</p>
+<pre><code class="language-rust ignore">tcx.infer_ctxt().enter(|infcx| {
+    // Use the inference context `infcx` here.
+})
+</code></pre>
+<p>Each inference context creates a short-lived type arena to store the
+fresh types and things that it will create, as described in the
+<a href="ty.html">chapter on the <code>ty</code> module</a>. This arena is created by the <code>enter</code>
+function and disposed of after it returns.</p>
+<p>Within the closure, <code>infcx</code> has the type <code>InferCtxt&lt;'cx, 'gcx, 'tcx&gt;</code>
+for some fresh <code>'cx</code> and <code>'tcx</code> – the latter corresponds to the lifetime of
+this temporary arena, and the <code>'cx</code> is the lifetime of the <code>InferCtxt</code> itself.
+(Again, see the <a href="ty.html"><code>ty</code> chapter</a> for more details on this setup.)</p>
+<p>The <code>tcx.infer_ctxt</code> method actually returns a builder, which means
+there are some kinds of configuration you can do before the <code>infcx</code> is
+created. See <code>InferCtxtBuilder</code> for more information.</p>
+<p><a name="vars"></a></p>
+<a class="header" href="#inference-variables" id="inference-variables"><h2>Inference variables</h2></a>
+<p>The main purpose of the inference context is to house a bunch of
+<strong>inference variables</strong> – these represent types or regions whose precise
+value is not yet known, but will be uncovered as we perform type-checking.</p>
+<p>If you're familiar with the basic ideas of unification from H-M type
+systems, or logic languages like Prolog, this is the same concept. If
+you're not, you might want to read a tutorial on how H-M type
+inference works, or perhaps this blog post on
+<a href="http://smallcultfollowing.com/babysteps/blog/2017/03/25/unification-in-chalk-part-1/">unification in the Chalk project</a>.</p>
+<p>All told, the inference context stores four kinds of inference variables as of
+this writing:</p>
+<ul>
+<li>Type variables, which come in three varieties:
+<ul>
+<li>General type variables (the most common). These can be unified with any
+type.</li>
+<li>Integral type variables, which can only be unified with an integral type,
+and arise from an integer literal expression like <code>22</code>.</li>
+<li>Float type variables, which can only be unified with a float type, and
+arise from a float literal expression like <code>22.0</code>.</li>
+</ul>
+</li>
+<li>Region variables, which represent lifetimes, and arise all over the place.</li>
+</ul>
+<p>All the type variables work in much the same way: you can create a new
+type variable, and what you get is <code>Ty&lt;'tcx&gt;</code> representing an
+unresolved type <code>?T</code>. Then later you can apply the various operations
+that the inferencer supports, such as equality or subtyping, and it
+will possibly <strong>instantiate</strong> (or <strong>bind</strong>) that <code>?T</code> to a specific
+value as a result.</p>
+<p>The region variables work somewhat differently, and are described
+below in a separate section.</p>
+<a class="header" href="#enforcing-equality--subtyping" id="enforcing-equality--subtyping"><h2>Enforcing equality / subtyping</h2></a>
+<p>The most basic operations you can perform in the type inferencer is
+<strong>equality</strong>, which forces two types <code>T</code> and <code>U</code> to be the same. The
+recommended way to add an equality constraint is to use the <code>at</code>
+method, roughly like so:</p>
+<pre><code class="language-rust ignore">infcx.at(...).eq(t, u);
+</code></pre>
+<p>The first <code>at()</code> call provides a bit of context, i.e. why you are
+doing this unification, and in what environment, and the <code>eq</code> method
+performs the actual equality constraint.</p>
+<p>When you equate things, you force them to be precisely equal. Equating
+returns an <code>InferResult</code> – if it returns <code>Err(err)</code>, then equating
+failed, and the enclosing <code>TypeError</code> will tell you what went wrong.</p>
+<p>The success case is perhaps more interesting. The &quot;primary&quot; return
+type of <code>eq</code> is <code>()</code> – that is, when it succeeds, it doesn't return a
+value of any particular interest. Rather, it is executed for its
+side-effects of constraining type variables and so forth. However, the
+actual return type is not <code>()</code>, but rather <code>InferOk&lt;()&gt;</code>. The
+<code>InferOk</code> type is used to carry extra trait obligations – your job is
+to ensure that these are fulfilled (typically by enrolling them in a
+fulfillment context). See the <a href="traits/resolution.html">trait chapter</a> for more background on that.</p>
+<p>You can similarly enforce subtyping through <code>infcx.at(..).sub(..)</code>. The same
+basic concepts as above apply.</p>
+<a class="header" href="#trying-equality" id="trying-equality"><h2>&quot;Trying&quot; equality</h2></a>
+<p>Sometimes you would like to know if it is <em>possible</em> to equate two
+types without error.  You can test that with <code>infcx.can_eq</code> (or
+<code>infcx.can_sub</code> for subtyping). If this returns <code>Ok</code>, then equality
+is possible – but in all cases, any side-effects are reversed.</p>
+<p>Be aware, though, that the success or failure of these methods is always
+<strong>modulo regions</strong>. That is, two types <code>&amp;'a u32</code> and <code>&amp;'b u32</code> will
+return <code>Ok</code> for <code>can_eq</code>, even if <code>'a != 'b</code>.  This falls out from the
+&quot;two-phase&quot; nature of how we solve region constraints.</p>
+<a class="header" href="#snapshots" id="snapshots"><h2>Snapshots</h2></a>
+<p>As described in the previous section on <code>can_eq</code>, often it is useful
+to be able to do a series of operations and then roll back their
+side-effects. This is done for various reasons: one of them is to be
+able to backtrack, trying out multiple possibilities before settling
+on which path to take. Another is in order to ensure that a series of
+smaller changes take place atomically or not at all.</p>
+<p>To allow for this, the inference context supports a <code>snapshot</code> method.
+When you call it, it will start recording changes that occur from the
+operations you perform. When you are done, you can either invoke
+<code>rollback_to</code>, which will undo those changes, or else <code>confirm</code>, which
+will make the permanent. Snapshots can be nested as long as you follow
+a stack-like discipline.</p>
+<p>Rather than use snapshots directly, it is often helpful to use the
+methods like <code>commit_if_ok</code> or <code>probe</code> that encapsulate higher-level
+patterns.</p>
+<a class="header" href="#subtyping-obligations" id="subtyping-obligations"><h2>Subtyping obligations</h2></a>
+<p>One thing worth discussing is subtyping obligations. When you force
+two types to be a subtype, like <code>?T &lt;: i32</code>, we can often convert those
+into equality constraints. This follows from Rust's rather limited notion
+of subtyping: so, in the above case, <code>?T &lt;: i32</code> is equivalent to <code>?T = i32</code>.</p>
+<p>However, in some cases we have to be more careful. For example, when
+regions are involved. So if you have <code>?T &lt;: &amp;'a i32</code>, what we would do
+is to first &quot;generalize&quot; <code>&amp;'a i32</code> into a type with a region variable:
+<code>&amp;'?b i32</code>, and then unify <code>?T</code> with that (<code>?T = &amp;'?b i32</code>). We then
+relate this new variable with the original bound:</p>
+<pre><code class="language-text">&amp;'?b i32 &lt;: &amp;'a i32
+</code></pre>
+<p>This will result in a region constraint (see below) of <code>'?b: 'a</code>.</p>
+<p>One final interesting case is relating two unbound type variables,
+like <code>?T &lt;: ?U</code>.  In that case, we can't make progress, so we enqueue
+an obligation <code>Subtype(?T, ?U)</code> and return it via the <code>InferOk</code>
+mechanism. You'll have to try again when more details about <code>?T</code> or
+<code>?U</code> are known.</p>
+<a class="header" href="#region-constraints" id="region-constraints"><h2>Region constraints</h2></a>
+<p>Regions are inferenced somewhat differently from types. Rather than
+eagerly unifying things, we simply collect constraints as we go, but
+make (almost) no attempt to solve regions. These constraints have the
+form of an &quot;outlives&quot; constraint:</p>
+<pre><code class="language-text">'a: 'b
+</code></pre>
+<p>Actually the code tends to view them as a subregion relation, but it's the same
+idea:</p>
+<pre><code class="language-text">'b &lt;= 'a
+</code></pre>
+<p>(There are various other kinds of constraints, such as &quot;verifys&quot;; see
+the <code>region_constraints</code> module for details.)</p>
+<p>There is one case where we do some amount of eager unification. If you have an
+equality constraint between two regions</p>
+<pre><code class="language-text">'a = 'b
+</code></pre>
+<p>we will record that fact in a unification table. You can then use
+<code>opportunistic_resolve_var</code> to convert <code>'b</code> to <code>'a</code> (or vice
+versa). This is sometimes needed to ensure termination of fixed-point
+algorithms.</p>
+<a class="header" href="#extracting-region-constraints" id="extracting-region-constraints"><h2>Extracting region constraints</h2></a>
+<p>Ultimately, region constraints are only solved at the very end of
+type-checking, once all other constraints are known. There are two
+ways to solve region constraints right now: lexical and
+non-lexical. Eventually there will only be one.</p>
+<p>To solve <strong>lexical</strong> region constraints, you invoke
+<code>resolve_regions_and_report_errors</code>.  This &quot;closes&quot; the region
+constraint process and invoke the <code>lexical_region_resolve</code> code. Once
+this is done, any further attempt to equate or create a subtyping
+relationship will yield an ICE.</p>
+<p>Non-lexical region constraints are not handled within the inference
+context. Instead, the NLL solver (actually, the MIR type-checker)
+invokes <code>take_and_reset_region_constraints</code> periodically. This
+extracts all of the outlives constraints from the region solver, but
+leaves the set of variables intact. This is used to get <em>just</em> the
+region constraints that resulted from some particular point in the
+program, since the NLL solver needs to know not just <em>what</em> regions
+were subregions but <em>where</em>. Finally, the NLL solver invokes
+<code>take_region_var_origins</code>, which &quot;closes&quot; the region constraint
+process in the same way as normal solving.</p>
+<a class="header" href="#lexical-region-resolution" id="lexical-region-resolution"><h2>Lexical region resolution</h2></a>
+<p>Lexical region resolution is done by initially assigning each region
+variable to an empty value. We then process each outlives constraint
+repeatedly, growing region variables until a fixed-point is reached.
+Region variables can be grown using a least-upper-bound relation on
+the region lattice in a fairly straightforward fashion.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="ty.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="traits/resolution.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="ty.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="traits/resolution.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

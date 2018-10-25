@@ -1,0 +1,592 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Region inference - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "../";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="../about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="../compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="../how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="../build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="../compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="../conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="../walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="../tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="../tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="../tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="../compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="../compiler-debugging.html"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="../profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="../profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="../high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="../rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="../rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="../query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="../incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="../incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="../the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="../test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="../macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="../name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="../hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="../lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="../ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="../type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="../traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="../traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="../traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="../traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="../traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="../traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="../traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="../traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="../traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="../traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="../traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="../traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="../traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="../traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="../traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="../traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="../traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="../traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="../type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="../method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="../variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="../existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="../mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="../mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="../mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="../mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="../mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="../borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="../borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="../borrow_check/region_inference.html" class="active"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="../const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="../miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="../param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="../codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="../diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="../appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="../appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="../appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="../appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#region-inference-nll" id="region-inference-nll"><h1>Region inference (NLL)</h1></a>
+<p>The MIR-based region checking code is located in
+<a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustc_mir/borrow_check/nll/index.html">the <code>rustc_mir::borrow_check::nll</code> module</a>. (NLL, of course,
+stands for &quot;non-lexical lifetimes&quot;, a term that will hopefully be
+deprecated once they become the standard kind of lifetime.)</p>
+<p>The MIR-based region analysis consists of two major functions:</p>
+<ul>
+<li><code>replace_regions_in_mir</code>, invoked first, has two jobs:
+<ul>
+<li>First, it finds the set of regions that appear within the
+signature of the function (e.g., <code>'a</code> in <code>fn foo&lt;'a&gt;(&amp;'a u32) { ... }</code>). These are called the &quot;universal&quot; or &quot;free&quot; regions – in
+particular, they are the regions that <a href="../appendix/background.html#free-vs-bound">appear free</a> in the
+function body.</li>
+<li>Second, it replaces all the regions from the function body with
+fresh inference variables. This is because (presently) those
+regions are the results of lexical region inference and hence are
+not of much interest. The intention is that – eventually – they
+will be &quot;erased regions&quot; (i.e., no information at all), since we
+won't be doing lexical region inference at all.</li>
+</ul>
+</li>
+<li><code>compute_regions</code>, invoked second: this is given as argument the
+results of move analysis. It has the job of computing values for all
+the inference variables that <code>replace_regions_in_mir</code> introduced.
+<ul>
+<li>To do that, it first runs the <a href="#mirtypeck">MIR type checker</a>. This
+is basically a normal type-checker but specialized to MIR, which
+is much simpler than full Rust of course. Running the MIR type
+checker will however create <strong>outlives constraints</strong> between
+region variables (e.g., that one variable must outlive another
+one) to reflect the subtyping relationships that arise.</li>
+<li>It also adds <strong>liveness constraints</strong> that arise from where variables
+are used.</li>
+<li>More details to come, though the <a href="http://rust-lang.github.io/rfcs/2094-nll.html">NLL RFC</a> also includes fairly thorough
+(and hopefully readable) coverage.</li>
+</ul>
+</li>
+</ul>
+<a class="header" href="#universal-regions" id="universal-regions"><h2>Universal regions</h2></a>
+<p><em>to be written</em> – explain the <code>UniversalRegions</code> type</p>
+<a class="header" href="#region-variables-and-constraints" id="region-variables-and-constraints"><h2>Region variables and constraints</h2></a>
+<p><em>to be written</em> – describe the <code>RegionInferenceContext</code> and
+the role of <code>liveness_constraints</code> vs other <code>constraints</code>, plus</p>
+<a class="header" href="#closures" id="closures"><h2>Closures</h2></a>
+<p><em>to be written</em></p>
+<p><a name="mirtypeck"></a></p>
+<a class="header" href="#the-mir-type-check" id="the-mir-type-check"><h2>The MIR type-check</h2></a>
+<a class="header" href="#representing-the-values-of-a-region-variable" id="representing-the-values-of-a-region-variable"><h2>Representing the &quot;values&quot; of a region variable</h2></a>
+<p>The value of a region can be thought of as a <strong>set</strong>; we call the
+domain of this set a <code>RegionElement</code>. In the code, the value for all
+regions is maintained in
+<a href="https://github.com/rust-lang/rust/tree/master/src/librustc_mir/borrow_check/nll/region_infer/">the <code>rustc_mir::borrow_check::nll::region_infer</code> module</a>. For
+each region we maintain a set storing what elements are present in its
+value (to make this efficient, we give each kind of element an index,
+the <code>RegionElementIndex</code>, and use sparse bitsets).</p>
+<p>The kinds of region elements are as follows:</p>
+<ul>
+<li>Each <strong>location</strong> in the MIR control-flow graph: a location is just
+the pair of a basic block and an index. This identifies the point
+<strong>on entry</strong> to the statement with that index (or the terminator, if
+the index is equal to <code>statements.len()</code>).</li>
+<li>There is an element <code>end('a)</code> for each universal region <code>'a</code>,
+corresponding to some portion of the caller's (or caller's caller,
+etc) control-flow graph.</li>
+<li>Similarly, there is an element denoted <code>end('static)</code> corresponding
+to the remainder of program execution after this function returns.</li>
+<li>There is an element <code>!1</code> for each placeholder region <code>!1</code>. This
+corresponds (intuitively) to some unknown set of other elements –
+for details on placeholders, see the section
+<a href="#placeholder">placeholders and universes</a>.</li>
+</ul>
+<a class="header" href="#causal-tracking" id="causal-tracking"><h2>Causal tracking</h2></a>
+<p><em>to be written</em> – describe how we can extend the values of a variable
+with causal tracking etc</p>
+<p><a name="placeholder"></a></p>
+<a class="header" href="#placeholders-and-universes" id="placeholders-and-universes"><h2>Placeholders and universes</h2></a>
+<p>(This section describes ongoing work that hasn't landed yet.)</p>
+<p>From time to time we have to reason about regions that we can't
+concretely know. For example, consider this program:</p>
+<pre><code class="language-rust ignore">// A function that needs a static reference
+fn foo(x: &amp;'static u32) { }
+
+fn bar(f: for&lt;'a&gt; fn(&amp;'a u32)) {
+       // ^^^^^^^^^^^^^^^^^^^ a function that can accept **any** reference
+    let x = 22;
+    f(&amp;x);
+}
+
+fn main() {
+    bar(foo);
+}
+</code></pre>
+<p>This program ought not to type-check: <code>foo</code> needs a static reference
+for its argument, and <code>bar</code> wants to be given a function that that
+accepts <strong>any</strong> reference (so it can call it with something on its
+stack, for example). But <em>how</em> do we reject it and <em>why</em>?</p>
+<a class="header" href="#subtyping-and-placeholders" id="subtyping-and-placeholders"><h3>Subtyping and Placeholders</h3></a>
+<p>When we type-check <code>main</code>, and in particular the call <code>bar(foo)</code>, we
+are going to wind up with a subtyping relationship like this one:</p>
+<pre><code class="language-text">fn(&amp;'static u32) &lt;: for&lt;'a&gt; fn(&amp;'a u32)
+----------------    -------------------
+the type of `foo`   the type `bar` expects
+</code></pre>
+<p>We handle this sort of subtyping by taking the variables that are
+bound in the supertype and replacing them with
+<a href="../appendix/background.html#quantified">universally quantified</a>
+representatives, written like <code>!1</code>. We call these regions &quot;placeholder
+regions&quot; – they represent, basically, &quot;some unknown region&quot;.</p>
+<p>Once we've done that replacement, we have the following relation:</p>
+<pre><code class="language-text">fn(&amp;'static u32) &lt;: fn(&amp;'!1 u32)
+</code></pre>
+<p>The key idea here is that this unknown region <code>'!1</code> is not related to
+any other regions. So if we can prove that the subtyping relationship
+is true for <code>'!1</code>, then it ought to be true for any region, which is
+what we wanted.</p>
+<p>So let's work through what happens next. To check if two functions are
+subtypes, we check if their arguments have the desired relationship
+(fn arguments are <a href="../appendix/background.html#variance">contravariant</a>, so
+we swap the left and right here):</p>
+<pre><code class="language-text">&amp;'!1 u32 &lt;: &amp;'static u32
+</code></pre>
+<p>According to the basic subtyping rules for a reference, this will be
+true if <code>'!1: 'static</code>. That is – if &quot;some unknown region <code>!1</code>&quot; lives
+outlives <code>'static</code>. Now, this <em>might</em> be true – after all, <code>'!1</code>
+could be <code>'static</code> – but we don't <em>know</em> that it's true. So this
+should yield up an error (eventually).</p>
+<a class="header" href="#what-is-a-universe" id="what-is-a-universe"><h3>What is a universe</h3></a>
+<p>In the previous section, we introduced the idea of a placeholder
+region, and we denoted it <code>!1</code>. We call this number <code>1</code> the <strong>universe
+index</strong>. The idea of a &quot;universe&quot; is that it is a set of names that
+are in scope within some type or at some point. Universes are formed
+into a tree, where each child extends its parents with some new names.
+So the <strong>root universe</strong> conceptually contains global names, such as
+the the lifetime <code>'static</code> or the type <code>i32</code>. In the compiler, we also
+put generic type parameters into this root universe (in this sense,
+there is not just one root universe, but one per item). So consider
+this function <code>bar</code>:</p>
+<pre><code class="language-rust ignore">struct Foo { }
+
+fn bar&lt;'a, T&gt;(t: &amp;'a T) {
+    ...
+}
+</code></pre>
+<p>Here, the root universe would consist of the lifetimes <code>'static</code> and
+<code>'a</code>.  In fact, although we're focused on lifetimes here, we can apply
+the same concept to types, in which case the types <code>Foo</code> and <code>T</code> would
+be in the root universe (along with other global types, like <code>i32</code>).
+Basically, the root universe contains all the names that
+<a href="../appendix/background.html#free-vs-bound">appear free</a> in the body of <code>bar</code>.</p>
+<p>Now let's extend <code>bar</code> a bit by adding a variable <code>x</code>:</p>
+<pre><code class="language-rust ignore">fn bar&lt;'a, T&gt;(t: &amp;'a T) {
+    let x: for&lt;'b&gt; fn(&amp;'b u32) = ...;
+}
+</code></pre>
+<p>Here, the name <code>'b</code> is not part of the root universe. Instead, when we
+&quot;enter&quot; into this <code>for&lt;'b&gt;</code> (e.g., by replacing it with a placeholder), we will create
+a child universe of the root, let's call it U1:</p>
+<pre><code class="language-text">U0 (root universe)
+│
+└─ U1 (child universe)
+</code></pre>
+<p>The idea is that this child universe U1 extends the root universe U0
+with a new name, which we are identifying by its universe number:
+<code>!1</code>.</p>
+<p>Now let's extend <code>bar</code> a bit by adding one more variable, <code>y</code>:</p>
+<pre><code class="language-rust ignore">fn bar&lt;'a, T&gt;(t: &amp;'a T) {
+    let x: for&lt;'b&gt; fn(&amp;'b u32) = ...;
+    let y: for&lt;'c&gt; fn(&amp;'b u32) = ...;
+}
+</code></pre>
+<p>When we enter <em>this</em> type, we will again create a new universe, which
+we'll call <code>U2</code>. Its parent will be the root universe, and U1 will be
+its sibling:</p>
+<pre><code class="language-text">U0 (root universe)
+│
+├─ U1 (child universe)
+│
+└─ U2 (child universe)
+</code></pre>
+<p>This implies that, while in U2, we can name things from U0 or U2, but
+not U1.</p>
+<p><strong>Giving existential variables a universe.</strong> Now that we have this
+notion of universes, we can use it to extend our type-checker and
+things to prevent illegal names from leaking out. The idea is that we
+give each inference (existential) variable – whether it be a type or
+a lifetime – a universe. That variable's value can then only
+reference names visible from that universe. So for example is a
+lifetime variable is created in U0, then it cannot be assigned a value
+of <code>!1</code> or <code>!2</code>, because those names are not visible from the universe
+U0.</p>
+<p><strong>Representing universes with just a counter.</strong> You might be surprised
+to see that the compiler doesn't keep track of a full tree of
+universes. Instead, it just keeps a counter – and, to determine if
+one universe can see another one, it just checks if the index is
+greater. For example, U2 can see U0 because 2 &gt;= 0. But U0 cannot see
+U2, because 0 &gt;= 2 is false.</p>
+<p>How can we get away with this? Doesn't this mean that we would allow
+U2 to also see U1? The answer is that, yes, we would, <strong>if that
+question ever arose</strong>.  But because of the structure of our type
+checker etc, there is no way for that to happen. In order for
+something happening in the universe U1 to &quot;communicate&quot; with something
+happening in U2, they would have to have a shared inference variable X
+in common. And because everything in U1 is scoped to just U1 and its
+children, that inference variable X would have to be in U0. And since
+X is in U0, it cannot name anything from U1 (or U2). This is perhaps easiest
+to see by using a kind of generic &quot;logic&quot; example:</p>
+<pre><code class="language-text">exists&lt;X&gt; {
+   forall&lt;Y&gt; { ... /* Y is in U1 ... */ }
+   forall&lt;Z&gt; { ... /* Z is in U2 ... */ }
+}
+</code></pre>
+<p>Here, the only way for the two foralls to interact would be through X,
+but neither Y nor Z are in scope when X is declared, so its value
+cannot reference either of them.</p>
+<a class="header" href="#universes-and-placeholder-region-elements" id="universes-and-placeholder-region-elements"><h3>Universes and placeholder region elements</h3></a>
+<p>But where does that error come from?  The way it happens is like this.
+When we are constructing the region inference context, we can tell
+from the type inference context how many placeholder variables exist
+(the <code>InferCtxt</code> has an internal counter). For each of those, we
+create a corresponding universal region variable <code>!n</code> and a &quot;region
+element&quot; <code>placeholder(n)</code>. This corresponds to &quot;some unknown set of other
+elements&quot;. The value of <code>!n</code> is <code>{placeholder(n)}</code>.</p>
+<p>At the same time, we also give each existential variable a
+<strong>universe</strong> (also taken from the <code>InferCtxt</code>). This universe
+determines which placeholder elements may appear in its value: For
+example, a variable in universe U3 may name <code>placeholder(1)</code>, <code>placeholder(2)</code>, and
+<code>placeholder(3)</code>, but not <code>placeholder(4)</code>. Note that the universe of an inference
+variable controls what region elements <strong>can</strong> appear in its value; it
+does not say region elements <strong>will</strong> appear.</p>
+<a class="header" href="#placeholders-and-outlives-constraints" id="placeholders-and-outlives-constraints"><h3>Placeholders and outlives constraints</h3></a>
+<p>In the region inference engine, outlives constraints have the form:</p>
+<pre><code class="language-text">V1: V2 @ P
+</code></pre>
+<p>where <code>V1</code> and <code>V2</code> are region indices, and hence map to some region
+variable (which may be universally or existentially quantified). The
+<code>P</code> here is a &quot;point&quot; in the control-flow graph; it's not important
+for this section. This variable will have a universe, so let's call
+those universes <code>U(V1)</code> and <code>U(V2)</code> respectively. (Actually, the only
+one we are going to care about is <code>U(V1)</code>.)</p>
+<p>When we encounter this constraint, the ordinary procedure is to start
+a DFS from <code>P</code>. We keep walking so long as the nodes we are walking
+are present in <code>value(V2)</code> and we add those nodes to <code>value(V1)</code>. If
+we reach a return point, we add in any <code>end(X)</code> elements. That part
+remains unchanged.</p>
+<p>But then <em>after that</em> we want to iterate over the placeholder <code>placeholder(x)</code>
+elements in V2 (each of those must be visible to <code>U(V2)</code>, but we
+should be able to just assume that is true, we don't have to check
+it). We have to ensure that <code>value(V1)</code> outlives each of those
+placeholder elements.</p>
+<p>Now there are two ways that could happen. First, if <code>U(V1)</code> can see
+the universe <code>x</code> (i.e., <code>x &lt;= U(V1)</code>), then we can just add <code>placeholder(x)</code>
+to <code>value(V1)</code> and be done. But if not, then we have to approximate:
+we may not know what set of elements <code>placeholder(x)</code> represents, but we
+should be able to compute some sort of <strong>upper bound</strong> B for it –
+some region B that outlives <code>placeholder(x)</code>. For now, we'll just use
+<code>'static</code> for that (since it outlives everything) – in the future, we
+can sometimes be smarter here (and in fact we have code for doing this
+already in other contexts). Moreover, since <code>'static</code> is in the root
+universe U0, we know that all variables can see it – so basically if
+we find that <code>value(V2)</code> contains <code>placeholder(x)</code> for some universe <code>x</code>
+that <code>V1</code> can't see, then we force <code>V1</code> to <code>'static</code>.</p>
+<a class="header" href="#extending-the-universal-regions-check" id="extending-the-universal-regions-check"><h3>Extending the &quot;universal regions&quot; check</h3></a>
+<p>After all constraints have been propagated, the NLL region inference
+has one final check, where it goes over the values that wound up being
+computed for each universal region and checks that they did not get
+'too large'. In our case, we will go through each placeholder region
+and check that it contains <em>only</em> the <code>placeholder(u)</code> element it is known to
+outlive. (Later, we might be able to know that there are relationships
+between two placeholder regions and take those into account, as we do
+for universal regions from the fn signature.)</p>
+<p>Put another way, the &quot;universal regions&quot; check can be considered to be
+checking constraints like:</p>
+<pre><code class="language-text">{placeholder(1)}: V1
+</code></pre>
+<p>where <code>{placeholder(1)}</code> is like a constant set, and V1 is the variable we
+made to represent the <code>!1</code> region.</p>
+<a class="header" href="#back-to-our-example" id="back-to-our-example"><h2>Back to our example</h2></a>
+<p>OK, so far so good. Now let's walk through what would happen with our
+first example:</p>
+<pre><code class="language-text">fn(&amp;'static u32) &lt;: fn(&amp;'!1 u32) @ P  // this point P is not imp't here
+</code></pre>
+<p>The region inference engine will create a region element domain like this:</p>
+<pre><code class="language-text">{ CFG; end('static); placeholder(1) }
+    ---  ------------  ------- from the universe `!1`
+    |    'static is always in scope
+    all points in the CFG; not especially relevant here
+</code></pre>
+<p>It will always create two universal variables, one representing
+<code>'static</code> and one representing <code>'!1</code>. Let's call them Vs and V1. They
+will have initial values like so:</p>
+<pre><code class="language-text">Vs = { CFG; end('static) } // it is in U0, so can't name anything else
+V1 = { placeholder(1) }
+</code></pre>
+<p>From the subtyping constraint above, we would have an outlives constraint like</p>
+<pre><code class="language-text">'!1: 'static @ P
+</code></pre>
+<p>To process this, we would grow the value of V1 to include all of Vs:</p>
+<pre><code class="language-text">Vs = { CFG; end('static) }
+V1 = { CFG; end('static), placeholder(1) }
+</code></pre>
+<p>At that point, constraint propagation is complete, because all the
+outlives relationships are satisfied. Then we would go to the &quot;check
+universal regions&quot; portion of the code, which would test that no
+universal region grew too large.</p>
+<p>In this case, <code>V1</code> <em>did</em> grow too large – it is not known to outlive
+<code>end('static)</code>, nor any of the CFG – so we would report an error.</p>
+<a class="header" href="#another-example" id="another-example"><h2>Another example</h2></a>
+<p>What about this subtyping relationship?</p>
+<pre><code class="language-text">for&lt;'a&gt; fn(&amp;'a u32, &amp;'a u32)
+    &lt;:
+for&lt;'b, 'c&gt; fn(&amp;'b u32, &amp;'c u32)
+</code></pre>
+<p>Here we would replace the bound region in the supertype with a placeholder, as before, yielding:</p>
+<pre><code class="language-text">for&lt;'a&gt; fn(&amp;'a u32, &amp;'a u32)
+    &lt;:
+fn(&amp;'!1 u32, &amp;'!2 u32)
+</code></pre>
+<p>then we instantiate the variable on the left-hand side with an
+existential in universe U2, yielding the following (<code>?n</code> is a notation
+for an existential variable):</p>
+<pre><code class="language-text">fn(&amp;'?3 u32, &amp;'?3 u32)
+    &lt;:
+fn(&amp;'!1 u32, &amp;'!2 u32)
+</code></pre>
+<p>Then we break this down further:</p>
+<pre><code class="language-text">&amp;'!1 u32 &lt;: &amp;'?3 u32
+&amp;'!2 u32 &lt;: &amp;'?3 u32
+</code></pre>
+<p>and even further, yield up our region constraints:</p>
+<pre><code class="language-text">'!1: '?3
+'!2: '?3
+</code></pre>
+<p>Note that, in this case, both <code>'!1</code> and <code>'!2</code> have to outlive the
+variable <code>'?3</code>, but the variable <code>'?3</code> is not forced to outlive
+anything else. Therefore, it simply starts and ends as the empty set
+of elements, and hence the type-check succeeds here.</p>
+<p>(This should surprise you a little. It surprised me when I first realized it.
+We are saying that if we are a fn that <strong>needs both of its arguments to have
+the same region</strong>, we can accept being called with <strong>arguments with two
+distinct regions</strong>. That seems intuitively unsound. But in fact, it's fine, as
+I tried to explain in <a href="https://github.com/rust-lang/rust/issues/32330#issuecomment-202536977">this issue</a> on the Rust issue
+tracker long ago.  The reason is that even if we get called with arguments of
+two distinct lifetimes, those two lifetimes have some intersection (the call
+itself), and that intersection can be our value of <code>'a</code> that we use as the
+common lifetime of our arguments. -nmatsakis)</p>
+<a class="header" href="#final-example" id="final-example"><h2>Final example</h2></a>
+<p>Let's look at one last example. We'll extend the previous one to have
+a return type:</p>
+<pre><code class="language-text">for&lt;'a&gt; fn(&amp;'a u32, &amp;'a u32) -&gt; &amp;'a u32
+    &lt;:
+for&lt;'b, 'c&gt; fn(&amp;'b u32, &amp;'c u32) -&gt; &amp;'b u32
+</code></pre>
+<p>Despite seeming very similar to the previous example, this case is going to get
+an error. That's good: the problem is that we've gone from a fn that promises
+to return one of its two arguments, to a fn that is promising to return the
+first one. That is unsound. Let's see how it plays out.</p>
+<p>First, we replace the bound region in the supertype with a placeholder:</p>
+<pre><code class="language-text">for&lt;'a&gt; fn(&amp;'a u32, &amp;'a u32) -&gt; &amp;'a u32
+    &lt;:
+fn(&amp;'!1 u32, &amp;'!2 u32) -&gt; &amp;'!1 u32
+</code></pre>
+<p>Then we instantiate the subtype with existentials (in U2):</p>
+<pre><code class="language-text">fn(&amp;'?3 u32, &amp;'?3 u32) -&gt; &amp;'?3 u32
+    &lt;:
+fn(&amp;'!1 u32, &amp;'!2 u32) -&gt; &amp;'!1 u32
+</code></pre>
+<p>And now we create the subtyping relationships:</p>
+<pre><code class="language-text">&amp;'!1 u32 &lt;: &amp;'?3 u32 // arg 1
+&amp;'!2 u32 &lt;: &amp;'?3 u32 // arg 2
+&amp;'?3 u32 &lt;: &amp;'!1 u32 // return type
+</code></pre>
+<p>And finally the outlives relationships. Here, let V1, V2, and V3 be the
+variables we assign to <code>!1</code>, <code>!2</code>, and <code>?3</code> respectively:</p>
+<pre><code class="language-text">V1: V3
+V2: V3
+V3: V1
+</code></pre>
+<p>Those variables will have these initial values:</p>
+<pre><code class="language-text">V1 in U1 = {placeholder(1)}
+V2 in U2 = {placeholder(2)}
+V3 in U2 = {}
+</code></pre>
+<p>Now because of the <code>V3: V1</code> constraint, we have to add <code>placeholder(1)</code> into <code>V3</code> (and
+indeed it is visible from <code>V3</code>), so we get:</p>
+<pre><code class="language-text">V3 in U2 = {placeholder(1)}
+</code></pre>
+<p>then we have this constraint <code>V2: V3</code>, so we wind up having to enlarge
+<code>V2</code> to include <code>placeholder(1)</code> (which it can also see):</p>
+<pre><code class="language-text">V2 in U2 = {placeholder(1), placeholder(2)}
+</code></pre>
+<p>Now constraint propagation is done, but when we check the outlives
+relationships, we find that <code>V2</code> includes this new element <code>placeholder(1)</code>,
+so we report an error.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../borrow_check/type_check.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../const-eval.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../borrow_check/type_check.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../const-eval.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

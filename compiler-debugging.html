@@ -1,0 +1,522 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Debugging the Compiler - Guide to Rustc Development</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="about-this-guide.html"><strong aria-hidden="true">1.</strong> About this guide</a></li><li><a href="compiler-team.html"><strong aria-hidden="true">2.</strong> About the compiler team</a></li><li><a href="how-to-build-and-run.html"><strong aria-hidden="true">3.</strong> How to build the compiler and run what you built</a></li><li><ol class="section"><li><a href="build-install-distribution-artifacts.html"><strong aria-hidden="true">3.1.</strong> Build and Install distribution artifacts</a></li><li><a href="compiler-documenting.html"><strong aria-hidden="true">3.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="conventions.html"><strong aria-hidden="true">4.</strong> Coding conventions</a></li><li><a href="walkthrough.html"><strong aria-hidden="true">5.</strong> Walkthrough: a typical contribution</a></li><li><a href="tests/intro.html"><strong aria-hidden="true">6.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="tests/running.html"><strong aria-hidden="true">6.1.</strong> Running tests</a></li><li><a href="tests/adding.html"><strong aria-hidden="true">6.2.</strong> Adding new tests</a></li><li><a href="compiletest.html"><strong aria-hidden="true">6.3.</strong> Using compiletest + commands to control testexecution</a></li></ol></li><li><a href="compiler-debugging.html" class="active"><strong aria-hidden="true">7.</strong> Debugging the Compiler</a></li><li><a href="profiling.html"><strong aria-hidden="true">8.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="profiling/with_perf.html"><strong aria-hidden="true">8.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="high-level-overview.html"><strong aria-hidden="true">9.</strong> High-level overview of the compiler source</a></li><li><a href="rustc-driver.html"><strong aria-hidden="true">10.</strong> The Rustc Driver</a></li><li><ol class="section"><li><a href="rustdoc.html"><strong aria-hidden="true">10.1.</strong> Rustdoc</a></li></ol></li><li><a href="query.html"><strong aria-hidden="true">11.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="incremental-compilation.html"><strong aria-hidden="true">11.1.</strong> Incremental compilation</a></li><li><a href="incrcomp-debugging.html"><strong aria-hidden="true">11.2.</strong> Debugging and Testing</a></li></ol></li><li><a href="the-parser.html"><strong aria-hidden="true">12.</strong> The parser</a></li><li><a href="test-implementation.html"><strong aria-hidden="true">13.</strong> #[test] Implementation</a></li><li><a href="macro-expansion.html"><strong aria-hidden="true">14.</strong> Macro expansion</a></li><li><a href="name-resolution.html"><strong aria-hidden="true">15.</strong> Name resolution</a></li><li><a href="hir.html"><strong aria-hidden="true">16.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="lowering.html"><strong aria-hidden="true">16.1.</strong> Lowering AST to HIR</a></li></ol></li><li><a href="ty.html"><strong aria-hidden="true">17.</strong> The ty module: representing types</a></li><li><a href="type-inference.html"><strong aria-hidden="true">18.</strong> Type inference</a></li><li><a href="traits/resolution.html"><strong aria-hidden="true">19.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="traits/hrtb.html"><strong aria-hidden="true">19.1.</strong> Higher-ranked trait bounds</a></li><li><a href="traits/caching.html"><strong aria-hidden="true">19.2.</strong> Caching subtleties</a></li><li><a href="traits/specialization.html"><strong aria-hidden="true">19.3.</strong> Specialization</a></li></ol></li><li><a href="traits/index.html"><strong aria-hidden="true">20.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="traits/lowering-to-logic.html"><strong aria-hidden="true">20.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="traits/goals-and-clauses.html"><strong aria-hidden="true">20.1.1.</strong> Goals and clauses</a></li><li><a href="traits/associated-types.html"><strong aria-hidden="true">20.1.2.</strong> Equality and associated types</a></li><li><a href="traits/implied-bounds.html"><strong aria-hidden="true">20.1.3.</strong> Implied bounds</a></li><li><a href="traits/regions.html"><strong aria-hidden="true">20.1.4.</strong> Region constraints</a></li></ol></li><li><a href="traits/canonical-queries.html"><strong aria-hidden="true">20.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="traits/canonicalization.html"><strong aria-hidden="true">20.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="traits/lowering-rules.html"><strong aria-hidden="true">20.3.</strong> Lowering rules</a></li><li><ol class="section"><li><a href="traits/lowering-module.html"><strong aria-hidden="true">20.3.1.</strong> The lowering module in rustc</a></li></ol></li><li><a href="traits/wf.html"><strong aria-hidden="true">20.4.</strong> Well-formedness checking</a></li><li><a href="traits/slg.html"><strong aria-hidden="true">20.5.</strong> The SLG solver</a></li><li><a href="traits/chalk-overview.html"><strong aria-hidden="true">20.6.</strong> An Overview of Chalk</a></li><li><a href="traits/bibliography.html"><strong aria-hidden="true">20.7.</strong> Bibliography</a></li></ol></li><li><a href="type-checking.html"><strong aria-hidden="true">21.</strong> Type checking</a></li><li><ol class="section"><li><a href="method-lookup.html"><strong aria-hidden="true">21.1.</strong> Method Lookup</a></li><li><a href="variance.html"><strong aria-hidden="true">21.2.</strong> Variance</a></li><li><a href="existential-types.html"><strong aria-hidden="true">21.3.</strong> Existential Types</a></li></ol></li><li><a href="mir/index.html"><strong aria-hidden="true">22.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="mir/construction.html"><strong aria-hidden="true">22.1.</strong> MIR construction</a></li><li><a href="mir/visitor.html"><strong aria-hidden="true">22.2.</strong> MIR visitor and traversal</a></li><li><a href="mir/passes.html"><strong aria-hidden="true">22.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="mir/optimizations.html"><strong aria-hidden="true">22.4.</strong> MIR optimizations</a></li></ol></li><li><a href="borrow_check.html"><strong aria-hidden="true">23.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization.html"><strong aria-hidden="true">23.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">23.1.1.</strong> Move paths</a></li></ol></li><li><a href="borrow_check/type_check.html"><strong aria-hidden="true">23.2.</strong> MIR type checker</a></li><li><a href="borrow_check/region_inference.html"><strong aria-hidden="true">23.3.</strong> Region inference</a></li></ol></li><li><a href="const-eval.html"><strong aria-hidden="true">24.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="miri.html"><strong aria-hidden="true">24.1.</strong> miri const evaluator</a></li></ol></li><li><a href="param_env.html"><strong aria-hidden="true">25.</strong> Parameter Environments</a></li><li><a href="codegen.html"><strong aria-hidden="true">26.</strong> Code Generation</a></li><li><a href="diag.html"><strong aria-hidden="true">27.</strong> Emitting Diagnostics</a></li><li class="spacer"></li><li><a href="appendix/stupid-stats.html"><strong aria-hidden="true">28.</strong> Appendix A: Stupid Stats</a></li><li><a href="appendix/background.html"><strong aria-hidden="true">29.</strong> Appendix B: Background material</a></li><li><a href="appendix/glossary.html"><strong aria-hidden="true">30.</strong> Appendix C: Glossary</a></li><li><a href="appendix/code-index.html"><strong aria-hidden="true">31.</strong> Appendix D: Code Index</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><strong>Note: This is copied from the
+<a href="https://github.com/rust-lang-nursery/rust-forge">rust-forge</a>. If anything needs
+updating, please open an issue or make a PR on the github repo.</strong></p>
+<a class="header" href="#debugging-the-compiler" id="debugging-the-compiler"><h1>Debugging the compiler</h1></a>
+<p>Here are a few tips to debug the compiler:</p>
+<a class="header" href="#getting-a-backtrace" id="getting-a-backtrace"><h2>Getting a backtrace</h2></a>
+<p>When you have an ICE (panic in the compiler), you can set
+<code>RUST_BACKTRACE=1</code> to get the stack trace of the <code>panic!</code> like in
+normal Rust programs.  IIRC backtraces <strong>don't work</strong> on Mac and on MinGW,
+sorry. If you have trouble or the backtraces are full of <code>unknown</code>,
+you might want to find some way to use Linux or MSVC on Windows.</p>
+<p>In the default configuration, you don't have line numbers enabled, so the
+backtrace looks like this:</p>
+<pre><code class="language-text">stack backtrace:
+   0: std::sys::imp::backtrace::tracing::imp::unwind_backtrace
+   1: std::sys_common::backtrace::_print
+   2: std::panicking::default_hook::{{closure}}
+   3: std::panicking::default_hook
+   4: std::panicking::rust_panic_with_hook
+   5: std::panicking::begin_panic
+   (~~~~ LINES REMOVED BY ME FOR BREVITY ~~~~)
+  32: rustc_typeck::check_crate
+  33: &lt;std::thread::local::LocalKey&lt;T&gt;&gt;::with
+  34: &lt;std::thread::local::LocalKey&lt;T&gt;&gt;::with
+  35: rustc::ty::context::TyCtxt::create_and_enter
+  36: rustc_driver::driver::compile_input
+  37: rustc_driver::run_compiler
+</code></pre>
+<p>If you want line numbers for the stack trace, you can enable
+<code>debuginfo-lines=true</code> or <code>debuginfo=true</code> in your config.toml and rebuild the
+compiler. Then the backtrace will look like this:</p>
+<pre><code class="language-text">stack backtrace:
+   (~~~~ LINES REMOVED BY ME FOR BREVITY ~~~~)
+             at /home/user/rust/src/librustc_typeck/check/cast.rs:110
+   7: rustc_typeck::check::cast::CastCheck::check
+             at /home/user/rust/src/librustc_typeck/check/cast.rs:572
+             at /home/user/rust/src/librustc_typeck/check/cast.rs:460
+             at /home/user/rust/src/librustc_typeck/check/cast.rs:370
+   (~~~~ LINES REMOVED BY ME FOR BREVITY ~~~~)
+  33: rustc_driver::driver::compile_input
+             at /home/user/rust/src/librustc_driver/driver.rs:1010
+             at /home/user/rust/src/librustc_driver/driver.rs:212
+  34: rustc_driver::run_compiler
+             at /home/user/rust/src/librustc_driver/lib.rs:253
+</code></pre>
+<a class="header" href="#getting-a-backtrace-for-errors" id="getting-a-backtrace-for-errors"><h2>Getting a backtrace for errors</h2></a>
+<p>If you want to get a backtrace to the point where the compiler emits
+an error message, you can pass the <code>-Z treat-err-as-bug</code>, which
+will make the compiler panic on the first error it sees.</p>
+<p>This can also help when debugging <code>delay_span_bug</code> calls - it will make
+the first <code>delay_span_bug</code> call panic, which will give you a useful backtrace.</p>
+<p>For example:</p>
+<pre><code class="language-bash">$ cat error.rs
+fn main() {
+    1 + ();
+}
+</code></pre>
+<pre><code class="language-bash">$ ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc error.rs
+error[E0277]: the trait bound `{integer}: std::ops::Add&lt;()&gt;` is not satisfied
+ --&gt; error.rs:2:7
+  |
+2 |     1 + ();
+  |       ^ no implementation for `{integer} + ()`
+  |
+  = help: the trait `std::ops::Add&lt;()&gt;` is not implemented for `{integer}`
+
+error: aborting due to previous error
+
+$ # Now, where does the error above come from?
+$ RUST_BACKTRACE=1 \
+    ./build/x86_64-unknown-linux-gnu/stage1/bin/rustc \
+    error.rs \
+    -Z treat-err-as-bug
+error[E0277]: the trait bound `{integer}: std::ops::Add&lt;()&gt;` is not satisfied
+ --&gt; error.rs:2:7
+  |
+2 |     1 + ();
+  |       ^ no implementation for `{integer} + ()`
+  |
+  = help: the trait `std::ops::Add&lt;()&gt;` is not implemented for `{integer}`
+
+error: internal compiler error: unexpected panic
+
+note: the compiler unexpectedly panicked. this is a bug.
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/blob/master/CONTRIBUTING.md#bug-reports
+
+note: rustc 1.24.0-dev running on x86_64-unknown-linux-gnu
+
+note: run with `RUST_BACKTRACE=1` for a backtrace
+
+thread 'rustc' panicked at 'encountered error with `-Z treat_err_as_bug',
+/home/user/rust/src/librustc_errors/lib.rs:411:12
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose
+backtrace.
+stack backtrace:
+  (~~~ IRRELEVANT PART OF BACKTRACE REMOVED BY ME ~~~)
+   7: rustc::traits::error_reporting::&lt;impl rustc::infer::InferCtxt&lt;'a, 'gcx,
+             'tcx&gt;&gt;::report_selection_error
+             at /home/user/rust/src/librustc/traits/error_reporting.rs:823
+   8: rustc::traits::error_reporting::&lt;impl rustc::infer::InferCtxt&lt;'a, 'gcx,
+             'tcx&gt;&gt;::report_fulfillment_errors
+             at /home/user/rust/src/librustc/traits/error_reporting.rs:160
+             at /home/user/rust/src/librustc/traits/error_reporting.rs:112
+   9: rustc_typeck::check::FnCtxt::select_obligations_where_possible
+             at /home/user/rust/src/librustc_typeck/check/mod.rs:2192
+  (~~~ IRRELEVANT PART OF BACKTRACE REMOVED BY ME ~~~)
+  36: rustc_driver::run_compiler
+             at /home/user/rust/src/librustc_driver/lib.rs:253
+$ # Cool, now I have a backtrace for the error
+</code></pre>
+<a class="header" href="#getting-logging-output" id="getting-logging-output"><h2>Getting logging output</h2></a>
+<p>The compiler has a lot of <code>debug!</code> calls, which print out logging information
+at many points. These are very useful to at least narrow down the location of
+a bug if not to find it entirely, or just to orient yourself as to why the
+compiler is doing a particular thing.</p>
+<p>To see the logs, you need to set the <code>RUST_LOG</code> environment variable to
+your log filter, e.g. to get the logs for a specific module, you can run the
+compiler as <code>RUST_LOG=module::path rustc my-file.rs</code>. The Rust logs are
+powered by <a href="https://docs.rs/env_logger/0.4.3/env_logger/">env-logger</a>, and you can look at the docs linked there to see
+the full <code>RUST_LOG</code> syntax. All <code>debug!</code> output will then appear in
+standard error.</p>
+<p>Note that unless you use a very strict filter, the logger will emit a <em>lot</em>
+of output - so it's typically a good idea to pipe standard error to a file
+and look at the log output with a text editor.</p>
+<p>So to put it together.</p>
+<pre><code class="language-bash"># This puts the output of all debug calls in `librustc/traits` into
+# standard error, which might fill your console backscroll.
+$ RUST_LOG=rustc::traits rustc +local my-file.rs
+
+# This puts the output of all debug calls in `librustc/traits` in
+# `traits-log`, so you can then see it with a text editor.
+$ RUST_LOG=rustc::traits rustc +local my-file.rs 2&gt;traits-log
+
+# Not recommended. This will show the output of all `debug!` calls
+# in the Rust compiler, and there are a *lot* of them, so it will be
+# hard to find anything.
+$ RUST_LOG=debug rustc +local my-file.rs 2&gt;all-log
+
+# This will show the output of all `info!` calls in `rustc_trans`.
+#
+# There's an `info!` statement in `trans_instance` that outputs
+# every function that is translated. This is useful to find out
+# which function triggers an LLVM assertion, and this is an `info!`
+# log rather than a `debug!` log so it will work on the official
+# compilers.
+$ RUST_LOG=rustc_trans=info rustc +local my-file.rs
+</code></pre>
+<p>While calls to <code>info!</code> are included in every build of the compiler,
+calls to <code>debug!</code> are only included in the program if the
+<code>debug-assertions=yes</code> is turned on in config.toml (it is
+turned off by default), so if you don't see <code>DEBUG</code> logs, especially
+if you run the compiler with <code>RUST_LOG=rustc rustc some.rs</code> and only see
+<code>INFO</code> logs, make sure that <code>debug-assertions=yes</code> is turned on in your
+config.toml.</p>
+<p>I also think that in some cases just setting it will not trigger a rebuild,
+so if you changed it and you already have a compiler built, you might
+want to call <code>x.py clean</code> to force one.</p>
+<a class="header" href="#logging-etiquette" id="logging-etiquette"><h3>Logging etiquette</h3></a>
+<p>Because calls to <code>debug!</code> are removed by default, in most cases, don't worry
+about adding &quot;unnecessary&quot; calls to <code>debug!</code> and leaving them in code you
+commit - they won't slow down the performance of what we ship, and if they
+helped you pinning down a bug, they will probably help someone else with a
+different one.</p>
+<p>However, there are still a few concerns that you might care about:</p>
+<a class="header" href="#expensive-operations-in-logs" id="expensive-operations-in-logs"><h3>Expensive operations in logs</h3></a>
+<p>A note of caution: the expressions <em>within</em> the <code>debug!</code> call are run
+whenever RUST_LOG is set, even if the filter would exclude the log. This means
+that if in the module <code>rustc::foo</code> you have a statement</p>
+<pre><code class="language-Rust">debug!(&quot;{:?}&quot;, random_operation(tcx));
+</code></pre>
+<p>Then if someone runs a debug <code>rustc</code> with <code>RUST_LOG=rustc::bar</code>, then
+<code>random_operation()</code> will still run - even while it's output will never be
+needed!</p>
+<p>This means that you should not put anything too expensive or likely
+to crash there - that would annoy anyone who wants to use logging for their own
+module. Note that if <code>RUST_LOG</code> is unset (the default), then the code will not
+run - this means that if your logging code panics, then no-one will know it
+until someone tries to use logging to find <em>another</em> bug.</p>
+<p>If you <em>need</em> to do an expensive operation in a log, be aware that while log
+expressions are <em>evaluated</em> even if logging is not enabled in your module,
+they are not <em>formatted</em> unless it <em>is</em>. This means you can put your
+expensive/crashy operations inside an <code>fmt::Debug</code> impl, and they will not be
+run unless your log is enabled:</p>
+<pre><code class="language-Rust">use std::fmt;
+
+struct ExpensiveOperationContainer&lt;'a, 'gcx, 'tcx&gt;
+    where 'tcx: 'gcx, 'a: 'tcx
+{
+    tcx: TyCtxt&lt;'a, 'gcx, 'tcx&gt;
+}
+
+impl&lt;'a, 'gcx, 'tcx&gt; fmt::Debug for ExpensiveOperationContainer&lt;'a, 'gcx, 'tcx&gt; {
+    fn fmt(&amp;self, fmt: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        let value = random_operation(tcx);
+        fmt::Debug::fmt(&amp;value, fmt)
+    }
+}
+
+debug!(&quot;{:?}&quot;, ExpensiveOperationContainer { tcx });
+</code></pre>
+<a class="header" href="#formatting-graphviz-output-dot-files" id="formatting-graphviz-output-dot-files"><h2>Formatting Graphviz output (.dot files)</h2></a>
+<p>Some compiler options for debugging specific features yield graphviz graphs -
+e.g. the <code>#[rustc_mir(borrowck_graphviz_postflow=&quot;suffix.dot&quot;)]</code> attribute
+dumps various borrow-checker dataflow graphs.</p>
+<p>These all produce <code>.dot</code> files. To view these files, install graphviz (e.g.
+<code>apt-get install graphviz</code>) and then run the following commands:</p>
+<pre><code class="language-bash">$ dot -T pdf maybe_init_suffix.dot &gt; maybe_init_suffix.pdf
+$ firefox maybe_init_suffix.pdf # Or your favorite pdf viewer
+</code></pre>
+<a class="header" href="#debugging-llvm" id="debugging-llvm"><h2>Debugging LLVM</h2></a>
+<blockquote>
+<p>NOTE: If you are looking for info about code generation, please see <a href="codegen.html">this
+chapter</a> instead.</p>
+</blockquote>
+<p>This section is about debugging compiler bugs in code generation (e.g. why the
+compiler generated some piece of code or crashed in LLVM).  LLVM is a big
+project on its own that probably needs to have its own debugging document (not
+that I could find one). But here are some tips that are important in a rustc
+context:</p>
+<p>As a general rule, compilers generate lots of information from analyzing code.
+Thus, a useful first step is usually to find a minimal example. One way to do
+this is to</p>
+<ol>
+<li>
+<p>create a new crate that reproduces the issue (e.g. adding whatever crate is
+at fault as a dependency, and using it from there)</p>
+</li>
+<li>
+<p>minimize the crate by removing external dependencies; that is, moving
+everything relevant to the new crate</p>
+</li>
+<li>
+<p>further minimize the issue by making the code shorter (there are tools that
+help with this like <code>creduce</code>)</p>
+</li>
+</ol>
+<p>The official compilers (including nightlies) have LLVM assertions disabled,
+which means that LLVM assertion failures can show up as compiler crashes (not
+ICEs but &quot;real&quot; crashes) and other sorts of weird behavior. If you are
+encountering these, it is a good idea to try using a compiler with LLVM
+assertions enabled - either an &quot;alt&quot; nightly or a compiler you build yourself
+by setting <code>[llvm] assertions=true</code> in your config.toml - and see whether
+anything turns up.</p>
+<p>The rustc build process builds the LLVM tools into
+<code>./build/&lt;host-triple&gt;/llvm/bin</code>. They can be called directly.</p>
+<p>The default rustc compilation pipeline has multiple codegen units, which is
+hard to replicate manually and means that LLVM is called multiple times in
+parallel.  If you can get away with it (i.e. if it doesn't make your bug
+disappear), passing <code>-C codegen-units=1</code> to rustc will make debugging easier.</p>
+<p>To rustc to generate LLVM IR, you need to pass the <code>--emit=llvm-ir</code> flag. If
+you are building via cargo, use the <code>RUSTFLAGS</code> environment variable (e.g.
+<code>RUSTFLAGS='--emit=llvm-ir'</code>). This causes rustc to spit out LLVM IR into the
+target directory.</p>
+<p><code>cargo llvm-ir [options] path</code> spits out the LLVM IR for a particular function
+at <code>path</code>. (<code>cargo install cargo-asm</code> installs <code>cargo asm</code> and <code>cargo llvm-ir</code>). <code>--build-type=debug</code> emits code for debug builds. There are also
+other useful options. Also, debug info in LLVM IR can clutter the output a lot:
+<code>RUSTFLAGS=&quot;-C debuginfo=0&quot;</code> is really useful.</p>
+<p><code>RUSTFLAGS=&quot;-C save-temps&quot;</code> outputs LLVM bitcode (not the same as IR) at
+different stages during compilation, which is sometimes useful. One just needs
+to convert the bitcode files to <code>.ll</code> files using <code>llvm-dis</code> which should be in
+the target local compilation of rustc.</p>
+<p>If you want to play with the optimization pipeline, you can use the <code>opt</code> tool
+from <code>./build/&lt;host-triple&gt;/llvm/bin/</code> with the LLVM IR emitted by rustc.  Note
+that rustc emits different IR depending on whether <code>-O</code> is enabled, even
+without LLVM's optimizations, so if you want to play with the IR rustc emits,
+you should:</p>
+<pre><code class="language-bash">$ rustc +local my-file.rs --emit=llvm-ir -O -C no-prepopulate-passes \
+    -C codegen-units=1
+$ OPT=./build/$TRIPLE/llvm/bin/opt
+$ $OPT -S -O2 &lt; my-file.ll &gt; my
+</code></pre>
+<p>If you just want to get the LLVM IR during the LLVM pipeline, to e.g. see which
+IR causes an optimization-time assertion to fail, or to see when LLVM performs
+a particular optimization, you can pass the rustc flag <code>-C llvm-args=-print-after-all</code>, and possibly add <code>-C llvm-args='-filter-print-funcs=EXACT_FUNCTION_NAME</code> (e.g.  <code>-C llvm-args='-filter-print-funcs=_ZN11collections3str21_$LT$impl$u20$str$GT$\ 7replace17hbe10ea2e7c809b0bE'</code>).</p>
+<p>That produces a lot of output into standard error, so you'll want to pipe that
+to some file. Also, if you are using neither <code>-filter-print-funcs</code> nor <code>-C codegen-units=1</code>, then, because the multiple codegen units run in parallel, the
+printouts will mix together and you won't be able to read anything.</p>
+<p>If you want just the IR for a specific function (say, you want to see why it
+causes an assertion or doesn't optimize correctly), you can use <code>llvm-extract</code>,
+e.g.</p>
+<pre><code class="language-bash">$ ./build/$TRIPLE/llvm/bin/llvm-extract \
+    -func='_ZN11collections3str21_$LT$impl$u20$str$GT$7replace17hbe10ea2e7c809b0bE' \
+    -S \
+    &lt; unextracted.ll \
+    &gt; extracted.ll
+</code></pre>
+<a class="header" href="#filing-llvm-bug-reports" id="filing-llvm-bug-reports"><h3>Filing LLVM bug reports</h3></a>
+<p>When filing an LLVM bug report, you will probably want some sort of minimal
+working example that demonstrates the problem. The Godbolt compiler explorer is
+really helpful for this.</p>
+<ol>
+<li>
+<p>Once you have some LLVM IR for the problematic code (see above), you can
+create a minimal working example with Godbolt. Go to
+<a href="https://gcc.godbolt.org">gcc.godbolt.org</a>.</p>
+</li>
+<li>
+<p>Choose <code>LLVM-IR</code> as programming language.</p>
+</li>
+<li>
+<p>Use <code>llc</code> to compile the IR to a particular target as is:</p>
+<ul>
+<li>There are some useful flags: <code>-mattr</code> enables target features, <code>-march=</code>
+selects the target, <code>-mcpu=</code> selects the CPU, etc.</li>
+<li>Commands like <code>llc -march=help</code> output all architectures available, which
+is useful because sometimes the Rust arch names and the LLVM names do not
+match.</li>
+<li>If you have compiled rustc yourself somewhere, in the target directory
+you have binaries for <code>llc</code>, <code>opt</code>, etc.</li>
+</ul>
+</li>
+<li>
+<p>If you want to optimize the LLVM-IR, you can use <code>opt</code> to see how the LLVM
+optimizations transform it.</p>
+</li>
+<li>
+<p>Once you have a godbolt link demonstrating the issue, it is pretty easy to
+fill in an LLVM bug.</p>
+</li>
+</ol>
+<a class="header" href="#narrowing-bisecting-regressions" id="narrowing-bisecting-regressions"><h2>Narrowing (Bisecting) Regressions</h2></a>
+<p>The <a href="https://github.com/rust-lang-nursery/cargo-bisect-rustc">cargo-bisect-rustc</a> tool can be used as a quick and easy way to find exactly which PR caused a change in <code>rustc</code> behavior. It automatically downloads <code>rustc</code> PR artifacts and tests them against a project you provide until it finds the regression. You can then look at the PR to get more context on <em>why</em> it was changed.  See <a href="https://github.com/rust-lang-nursery/cargo-bisect-rustc/blob/master/TUTORIAL.md">this tutorial</a> on how to use it.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="compiletest.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="profiling.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="compiletest.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="profiling.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
